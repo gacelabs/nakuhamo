@@ -29,6 +29,7 @@ var translateText = function (text, sourceLang, targetLang) {
 			q: text
 		},
 		success: function (response) {
+			console.log(response);
 			if (response && response[0] && response[0][0] && response[0][0][0]) {
 				$('#translated-text').text(response[0][0][0]);
 			} else {

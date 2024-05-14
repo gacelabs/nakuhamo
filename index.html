@@ -9,6 +9,7 @@
 		<link rel="stylesheet" href="assets/html/style/w3-theme-black.css">
 		<link rel="stylesheet" href="assets/html/style/fonts.googleapis.css">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="stylesheet" href="assets/html/style/jquery-ui.css">
 		<link rel="stylesheet" href="assets/html/style/main.css">
 	</head>
 
@@ -49,6 +50,10 @@
 
 			<div class="w3-row w3-padding-64">
 				<div class="w3-twothird w3-container">
+					<div class="ui-widget">
+						<label for="birds">Select a dialect: </label>
+						<input id="dialect" value=""/>
+					</div>
 					<h1 class="w3-text-teal">Last copied text:</h1>
 					<p id="last-copied-text">No detected text copied to clipboard yet!</p>
 				</div>
@@ -123,8 +128,10 @@
 	</body>
 
 	<script src="assets/html/javascript/jquery-3.6.0.min.js"></script>
+	<script src="assets/html/javascript/jquery-ui.js"></script>
 	<script src="assets/html/javascript/html2canvas.min.js"></script>
 	<script src="assets/html/javascript/tesseract.min.js"></script>
 	<script src="assets/html/javascript/common.js"></script>
+	<script src="assets/html/javascript/main.js"></script>
 
 </html>
