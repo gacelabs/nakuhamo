@@ -7,6 +7,7 @@ var detectClipboard = async function() {
 			// Read the text from the clipboard
 			const text = await navigator.clipboard.readText();
 			$('#last-copied-text').text(text);
+			console.log(detectLanguage(text));
 			translateText(text, 'en', 'es');
 		} else {
 			console.error('Clipboard access denied.');
@@ -40,4 +41,14 @@ var translateText = function (text, sourceLang, targetLang) {
 			console.error('Error translating text:', error);
 		}
 	});
+}
+
+function detectLanguage(text) {
+	const detectedLangCode = franc(text);
+	if (detectedLangCode === 'und') {
+		return false;
+	} else {
+		const detectedLang = iso6393[detectedLangCode] ? iso6393[detectedLangCode].name : detectedLangCode;
+		return detectedLang;
+	}
 }
