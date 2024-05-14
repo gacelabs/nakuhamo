@@ -1,1 +1,5 @@
-[ { "label": "Tagalog", "value": "Tagalog", "data": "tl" }, { "label": "English", "value": "English", "data": "en_US" } ]
+[
+  { "label": "Tagalog", "value": "Tagalog", "data": "tl" },
+  { "label": "Latin American Spanish", "value": "Latin American Spanish", "data": "es_419" },
+  { "label": "Brazilian Portuguese", "value": "Brazilian Portuguese", "data": "pt_BR" }
+]

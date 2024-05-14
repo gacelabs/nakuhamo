@@ -18,5 +18,7 @@ $(document).ready(function () {
 		if (sText.length) {
 			$(this).val(sText);
 		}
+	}).on('paste', function (e) {
+		$(this).val('');
 	});
 });
