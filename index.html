@@ -8,6 +8,7 @@
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@vitalets/google-translate-api-browser@1.0.6/dist/google-translate-api-browser.js"></script>
 		<style>
 			body {
 				position: relative;
@@ -26,12 +27,15 @@
 	</head>
 
 	<body>
+		<p>Last copied text:</p>
 		<div id="last-copied-text"></div>
-		<div id="result">
+		<p>Translated text:</p>
+		<div id="translated-text"></div>
+		<!-- <div id="result">
 			<h2>Extracted Text:</h2>
 			<p id="extracted-text"></p>
 		</div>
-		<div id="selection-box"></div>
+		<div id="selection-box"></div> -->
 		<script>
 			$(document).ready(function () {
 				/* let startX,
@@ -113,12 +117,38 @@
 						} */
 						const text = await navigator.clipboard.readText();
 						$('#last-copied-text').text(text);
+						translateText(text, 'en', 'es');
 					} else {
 						console.error('Clipboard access denied.');
 					}
 				} catch (err) {
 					console.error('Failed to read clipboard contents: ', err);
 				}
+			}
+
+			var translateText = function (text, sourceLang, targetLang) {
+				$.ajax({
+					url: 'https://translate.googleapis.com/translate_a/single',
+					type: 'GET',
+					dataType: 'json',
+					data: {
+						client: 'gtx',
+						sl: sourceLang,
+						tl: targetLang,
+						dt: 't',
+						q: text
+					},
+					success: function (response) {
+						if (response && response[0] && response[0][0] && response[0][0][0]) {
+							$('#translated-text').text(response[0][0][0]);
+						} else {
+							console.error('Failed to translate text.');
+						}
+					},
+					error: function (xhr, status, error) {
+						console.error('Error translating text:', error);
+					}
+				});
 			}
 		</script>
 	</body>
