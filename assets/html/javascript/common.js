@@ -7,8 +7,8 @@ var detectClipboard = async function() {
 			// Read the text from the clipboard
 			const text = await navigator.clipboard.readText();
 			$('#last-copied-text').text(text);
-			console.log(detectLanguage(text));
-			translateText(text, 'en', 'es');
+			// console.log(detectLanguage(text));
+			// translateText(text, 'en', 'es');
 		} else {
 			console.error('Clipboard access denied.');
 		}
