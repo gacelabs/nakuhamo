@@ -112,7 +112,7 @@
 							console.error('The clipboard does not contain a valid URL.');
 						} */
 						const text = await navigator.clipboard.readText();
-						$('#last-copied-text').text(pastedText);
+						$('#last-copied-text').text(text);
 					} else {
 						console.error('Clipboard access denied.');
 					}
