@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Screen Capture and OCR</title>
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+
+			#result {
+				margin-top: 20px;
+			}
+
+			.hidden {
+				display: none;
+			}
+		</style>
+	</head>
+
+	<body>
+		<h1>Screen Capture and OCR</h1>
+		<p>Please install the following browser extension to capture your screen:</p>
+		<ul>
+			<li><a href="https://chromewebstore.google.com/detail/nimbus-screenshot-screen/bpconcjcammlapcogcnnelfmaeghhagj" target="_blank">Nimbus Screenshot & Screen Video Recorder</a></li>
+		</ul>
+		<p>After installing the extension, use it to capture the screen and then upload the screenshot below.</p>
+
+		<input type="file" id="image-upload" accept="image/*" class="hidden" />
+		<button id="upload-btn">Upload Screenshot</button>
+
+		<div id="result">
+			<h2>Extracted Text:</h2>
+			<p id="extracted-text"></p>
+		</div>
+
+		<script>
+			$(document).ready(function () {
+				$('#upload-btn').on('click', function () {
+					$('#image-upload').click();
+				});
+
+				$('#image-upload').on('change', function (event) {
+					const file = event.target.files[0];
+					if (file) {
+						const reader = new FileReader();
+						reader.onload = function (e) {
+							const img = new Image();
+							img.src = e.target.result;
+							img.onload = function () {
+								const canvas = document.createElement('canvas');
+								canvas.width = img.width;
+								canvas.height = img.height;
+								const ctx = canvas.getContext('2d');
+								ctx.drawImage(img, 0, 0);
+								const imageData = canvas.toDataURL('image/png');
+								Tesseract.recognize(
+									imageData,
+									'eng',
+									{
+										logger: m => console.log(m)
+									}
+								).then(({ data: { text } }) => {
+									$('#extracted-text').text(text);
+								}).catch(err => {
+									console.error(err);
+								});
+							}
+						};
+						reader.readAsDataURL(file);
+					}
+				});
+			});
+		</script>
+	</body>
+
+</html>

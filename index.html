@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Screen Capture and OCR</title>
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+		<style>
+			body {
+				position: relative;
+			}
+			#selection-box {
+				border: 2px dashed #000;
+				position: absolute;
+				display: none;
+				z-index: 9999;
+				background-color: rgba(255, 255, 255, 0.5);
+			}
+			#result {
+				margin-top: 20px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<iframe src="" frameborder="0" id="clipboard-url"></iframe>
+		<div id="result">
+			<h2>Extracted Text:</h2>
+			<p id="extracted-text"></p>
+		</div>
+		<div id="selection-box"></div>
+		<script>
+			$(document).ready(function () {
+				let startX,
+					startY,
+					endX,
+					endY,
+					isSelecting = false;
+
+				const selectionBox = $("#selection-box");
+
+				$(document).mousedown(function (e) {
+					startX = e.pageX;
+					startY = e.pageY;
+					isSelecting = true;
+					selectionBox.css({
+						left: startX + "px",
+						top: startY + "px",
+						width: 0,
+						height: 0,
+						display: "block",
+					});
+				});
+
+				$(document).mousemove(function (e) {
+					if (isSelecting) {
+						endX = e.pageX;
+						endY = e.pageY;
+						selectionBox.css({
+							width: Math.abs(endX - startX) + "px",
+							height: Math.abs(endY - startY) + "px",
+							left: Math.min(endX, startX) + "px",
+							top: Math.min(endY, startY) + "px",
+						});
+					}
+				});
+
+				$(document).mouseup(function (e) {
+					isSelecting = false;
+					html2canvas(document.body, {
+						x: Math.min(startX, endX),
+						y: Math.min(startY, endY),
+						width: Math.abs(endX - startX),
+						height: Math.abs(endY - startY),
+					}).then((canvas) => {
+						selectionBox.hide();
+						const imageData = canvas.toDataURL("image/png");
+						Tesseract.recognize(imageData, "eng", {
+							logger: (m) => console.log(m),
+						})
+							.then(({ data: { text } }) => {
+								$("#extracted-text").text(text);
+							})
+							.catch((err) => {
+								console.error(err);
+							});
+					});
+				});
+			});
+
+			var detectClipboard = async function() {
+				try {
+					// Request permission to read from the clipboard
+					const permission = await navigator.permissions.query({ name: 'clipboard-read' });
+					// console.log(permission.state);
+					if (permission.state === 'granted' || permission.state === 'prompt') {
+						// Read the text from the clipboard
+						const text = await navigator.clipboard.readText();
+						const urlPattern = new RegExp('^(https?:\\/\\/)?' + // protocol
+							'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|' + // domain name
+							'((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+							'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+							'(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+							'(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+
+						if (urlPattern.test(text)) {
+							$('#clipboard-url').attr('src', text);
+						} else {
+							console.error('The clipboard does not contain a valid URL.');
+						}
+					} else {
+						console.error('Clipboard access denied.');
+					}
+				} catch (err) {
+					console.error('Failed to read clipboard contents: ', err);
+				}
+			}
+		</script>
+	</body>
+
+</html>
