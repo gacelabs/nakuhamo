@@ -13,11 +13,10 @@ $(document).ready(function () {
 		$(this).keydown();
 	});
 
-	var i = setInterval(() => {
+	$('#last-copied-text').on('click', function (e) {
 		var sText = detectClipboard();
 		if (sText.length) {
-			$('#last-copied-text').val(sText);
-			clearInterval(i);
+			$(this).val(sText);
 		}
-	}, 1000);
+	});
 });

@@ -31,7 +31,10 @@ var translateText = function (text, sourceLang, targetLang) {
 		},
 		success: function (response) {
 			console.log(response);
-			if (response && response[0] && response[0][0] && response[0][0][0]) {
+			if (response && response[0] && response[0][0]) {
+				response[0][0].forEach(element => {
+					
+				});
 				$('#translated-text').text(response[0][0][0]);
 			} else {
 				console.error('Failed to translate text.');
