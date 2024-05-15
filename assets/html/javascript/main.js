@@ -46,7 +46,11 @@ $(document).ready(function () {
 			window.speechSynthesis.cancel();
 	
 			try {
-				speechQueue = splitTextIntoChunks(text, MAX_CHUNK_LENGTH);
+				if (speechQueue.length == 0) {
+					speechQueue = splitTextIntoChunks(text, MAX_CHUNK_LENGTH);
+				} else {
+					isSpeaking = false;
+				}
 				speakNextChunk();
 			} catch (error) {
 				showToast({ content: error, type: 'bad' });
