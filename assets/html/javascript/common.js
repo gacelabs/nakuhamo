@@ -195,6 +195,7 @@ var recordText = function() {
 	const startRecordBtn = $('#start-record-btn');
 	const startSpeakBtn = $('#start-speak-btn');
 	const capturedTextDiv = $('#last-copied-text');
+	var recognizedText = '';
 
 	let recognition;
 	if ('webkitSpeechRecognition' in window) {
@@ -211,39 +212,37 @@ var recordText = function() {
 	recognition.lang = 'en-US'; // Set the language of the recognition
 
 	recognition.onstart = function () {
-		startRecordBtn.css('pointer-events', 'none');
-		startSpeakBtn.css('pointer-events', 'none');
-		capturedTextDiv.text('Listening...');
+		startRecordBtn.attr('data-recording', 1);
+		startRecordBtn.css({ 'pointer-events':'none', 'background':'red !important' });
+		startSpeakBtn.css({ 'pointer-events':'none', 'background':'gray !important' });
+		$('#translated-text').text('Listening...');
 	};
 
 	recognition.onresult = function (event) {
+		startRecordBtn.css({ 'background': '' });
+		startSpeakBtn.css({ 'background': '' });
 		console.log(event.results);
-		const transcript = event.results[0][0].transcript;
-		capturedTextDiv.text(transcript);
+		recognizedText += event.results[0][0].transcript;
 	};
-
+	
 	recognition.onerror = function (event) {
 		capturedTextDiv.text('Error occurred in recognition: ' + event.error);
 	};
-
+	
 	recognition.onend = function () {
-		startRecordBtn.css('pointer-events', '');
-		startSpeakBtn.css('pointer-events', '');
+		startRecordBtn.css({ 'pointer-events':'' });
+		startSpeakBtn.css({ 'pointer-events':'' });
+		startRecordBtn.removeAttr('data-recording');
+		capturedTextDiv.text(transcript);
 	};
 
 	startRecordBtn.click(function () {
 		if (startRecordBtn.attr('data-recording') != 1) {
 			recognition.start();
 			console.log("recorder started");
-			startRecordBtn.css('background', 'red !important');
-			startSpeakBtn.css('background', 'gray !important');
-			startRecordBtn.attr('data-recording', 1);
 		} else {
 			recognition.stop();
 			console.log("recorder stopped");
-			startRecordBtn.css('background', '');
-			startSpeakBtn.css('background', '');
-			startRecordBtn.removeAttr('data-recording');
 		}
 	});
 
