@@ -232,7 +232,7 @@ var recordText = function() {
 	recognition.onend = function () {
 		startSpeakBtn.css({ 'pointer-events':'' });
 		startRecordBtn.removeAttr('data-recording');
-		capturedTextDiv.text(transcript);
+		capturedTextDiv.text(recognizedText);
 	};
 
 	startRecordBtn.click(function () {
