@@ -37,7 +37,7 @@ $(document).ready(function () {
 	$('#start-speak-btn').click(function () {
 		// console.log(isSpeaking);
 		if (isSpeaking == false) {
-			const text = $('#translated-text').text();
+			var text = $('#translated-text').text();
 			if (text.trim() === '') {
 				showToast({ content: 'Please enter some text to translate', type: 'bad' });
 				return;
@@ -65,10 +65,10 @@ $(document).ready(function () {
 
 var speechQueue = [];
 var isSpeaking = false;
-const MAX_CHUNK_LENGTH = 200;
+var MAX_CHUNK_LENGTH = 200;
 
 function splitTextIntoChunks(text, maxLength) {
-	const chunks = [];
+	var chunks = [];
 	var start = 0;
 	while (start < text.length) {
 		var end = Math.min(start + maxLength, text.length);
@@ -93,8 +93,8 @@ function speakNextChunk() {
 	// console.log(sLanguage);
 
 	isSpeaking = true;
-	const chunk = speechQueue.shift();
-	const utterance = new SpeechSynthesisUtterance(chunk);
+	var chunk = speechQueue.shift();
+	var utterance = new SpeechSynthesisUtterance(chunk);
 	utterance.lang = sLanguage; // Set the language
 	utterance.onend = function () {
 		// console.log(speechQueue, isSpeaking);
