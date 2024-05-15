@@ -37,10 +37,11 @@ $(document).ready(function () {
 	$('#start-speak-btn').click(function () {
 		const text = $('#translated-text').text();
 		if (text.trim() === '') {
-			showToast({ conten: 'Please enter some text to translate', type: 'bad' });
+			showToast({ content: 'Please enter some text to translate', type: 'bad' });
 			return;
 		}
 		let sLanguage = $("#dialect").attr('data-dialect');
+		window.speechSynthesis.cancel();
 
 		if (sLanguage) {
 			try {
@@ -49,7 +50,7 @@ $(document).ready(function () {
 				utterance.lang = sLanguage; // Set the language
 				window.speechSynthesis.speak(utterance);
 			} catch (error) {
-				showToast({ conten: error, type: 'bad' });
+				showToast({ content: error, type: 'bad' });
 			}
 		}
 	});

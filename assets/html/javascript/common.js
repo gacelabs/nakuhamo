@@ -134,7 +134,7 @@ function showToast(params) {
 function showNotification(title, body, redirectUrl) {
 	if (("Notification" in window) == false) {
 		console.error("This browser does not support desktop notification");
-		showToast({ conten: 'This browser does not support desktop notification', type: 'bad' });
+		showToast({ content: 'This browser does not support desktop notification', type: 'bad' });
 		return;
 	}
 	
