@@ -13,14 +13,14 @@ $(document).ready(function () {
 		$(this).keydown();
 	});
 
-	$('#last-copied-text').on('click', function (e) {
+	/* $('#last-copied-text').on('click', function (e) {
 		var sText = detectClipboard();
 		if (sText.length) {
 			$(this).val(sText);
 		}
 	}).on('paste', function (e) {
 		$(this).val('');
-	});
+	}); */
 	
 	$('#start-record-btn').on('click', recordText);
 

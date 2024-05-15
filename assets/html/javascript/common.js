@@ -17,6 +17,31 @@ var detectClipboard = async function() {
 	}
 }
 
+var detectLanguage = function() {
+	try {
+		$.get("https://ipinfo.io", function (ipinfo) {
+			console.log(ipinfo);
+			var fnCall = function (tz_languages) {
+				console.log(tz_languages);
+				var oLanguages = new JSONQuery(tz_languages);
+				var query = {
+					select: { fields: '*' },
+					where: {
+						condition: [
+							{ field: 'timezone', operator: '=', value: ipinfo.timezone },
+						]
+					}
+				};
+				var result = oLanguages.execute(query);
+				console.log(result);
+			};
+			$.get("/assets/data/languages-tz.json", fnCall, "json");
+		}, "json");
+	} catch (err) {
+		console.error('Failed to read clipboard contents: ', err);
+	}
+}
+
 var translateText = function (text, sourceLang, targetLang) {
 	$.ajax({
 		url: 'https://translate.googleapis.com/translate_a/single',
