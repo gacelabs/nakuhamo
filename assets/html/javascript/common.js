@@ -213,7 +213,7 @@ var recordText = function() {
 
 	recognition.onstart = function () {
 		startRecordBtn.attr('data-recording', 1);
-		startRecordBtn.css({ 'pointer-events':'none', 'background':'red !important' });
+		startRecordBtn.css({ 'background':'red !important' });
 		startSpeakBtn.css({ 'pointer-events':'none', 'background':'gray !important' });
 		$('#translated-text').text('Listening...');
 	};
@@ -230,7 +230,6 @@ var recordText = function() {
 	};
 	
 	recognition.onend = function () {
-		startRecordBtn.css({ 'pointer-events':'' });
 		startSpeakBtn.css({ 'pointer-events':'' });
 		startRecordBtn.removeAttr('data-recording');
 		capturedTextDiv.text(transcript);
