@@ -181,7 +181,7 @@ var recordText = function() {
 		return;
 	}
 
-	recognition.continuous = false; // Set to true for continuous recognition
+	recognition.continuous = true; // Set to true for continuous recognition
 	recognition.interimResults = false; // Set to true if you want to show interim results
 	recognition.lang = 'en-US'; // Set the language of the recognition
 
