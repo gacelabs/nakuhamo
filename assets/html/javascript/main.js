@@ -35,23 +35,21 @@ $(document).ready(function () {
 	$(window).resize(); */
 
 	$('#start-speak-btn').click(function () {
+		console.log(isSpeaking);
 		if (isSpeaking == false) {
 			const text = $('#translated-text').text();
 			if (text.trim() === '') {
 				showToast({ content: 'Please enter some text to translate', type: 'bad' });
 				return;
 			}
-			let sLanguage = $("#dialect").attr('data-dialect');
 			// Cancel any ongoing speech synthesis
 			window.speechSynthesis.cancel();
 	
-			if (sLanguage) {
-				try {
-					speechQueue = splitTextIntoChunks(text, MAX_CHUNK_LENGTH);
-					speakNextChunk();
-				} catch (error) {
-					showToast({ content: error, type: 'bad' });
-				}
+			try {
+				speechQueue = splitTextIntoChunks(text, MAX_CHUNK_LENGTH);
+				speakNextChunk();
+			} catch (error) {
+				showToast({ content: error, type: 'bad' });
 			}
 		} else {
 			window.speechSynthesis.cancel();
@@ -60,15 +58,15 @@ $(document).ready(function () {
 	});
 });
 
-let speechQueue = [];
-let isSpeaking = false;
+var speechQueue = [];
+var isSpeaking = false;
 const MAX_CHUNK_LENGTH = 200;
 
 function splitTextIntoChunks(text, maxLength) {
 	const chunks = [];
-	let start = 0;
+	var start = 0;
 	while (start < text.length) {
-		let end = Math.min(start + maxLength, text.length);
+		var end = Math.min(start + maxLength, text.length);
 		if (end < text.length) {
 			while (end > start && !/\s/.test(text[end])) {
 				end--;
@@ -81,12 +79,12 @@ function splitTextIntoChunks(text, maxLength) {
 }
 
 function speakNextChunk() {
-	if (speechQueue.length === 0 || !isSpeaking) {
+	if (speechQueue.length === 0 || isSpeaking) {
 		isSpeaking = false;
 		return;
 	}
 
-	let sLanguage = $("#dialect").attr('data-dialect');
+	var sLanguage = $("#dialect").attr('data-dialect');
 	console.log(sLanguage);
 
 	isSpeaking = true;
@@ -94,7 +92,9 @@ function speakNextChunk() {
 	const utterance = new SpeechSynthesisUtterance(chunk);
 	utterance.lang = sLanguage; // Set the language
 	utterance.onend = function () {
-		speakNextChunk();
+		console.log(speechQueue, isSpeaking);
+		isSpeaking = false;
+		return speakNextChunk();
 	};
 	window.speechSynthesis.speak(utterance);
 }
