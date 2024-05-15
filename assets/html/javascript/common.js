@@ -169,7 +169,7 @@ var requestPermission = function (origin_data, dest_data) {
 var recordText = function() {
 	const startRecordBtn = $('#start-record-btn');
 	const startSpeakBtn = $('#start-speak-btn');
-	const capturedTextDiv = $('#translated-text');
+	const capturedTextDiv = $('#last-copied-text');
 
 	let recognition;
 	if ('webkitSpeechRecognition' in window) {
