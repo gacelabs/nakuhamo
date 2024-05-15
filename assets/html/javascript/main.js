@@ -21,4 +21,15 @@ $(document).ready(function () {
 	}).on('paste', function (e) {
 		$(this).val('');
 	});
+	
+	$('#start-record-btn').on('click', recordText);
+
+	/* $(window).on('resize', function (e) {
+		if (mobileCheck() || mobileAndTabletCheck()) {
+			$('#start-record-btn').css({ 'margin': 'auto', 'margin-bottom': '10px' });
+		} else {
+			$('#start-record-btn').css({ 'margin': '-50px 0 10px', 'margin-bottom': 'auto' });
+		}
+	});
+	$(window).resize(); */
 });
