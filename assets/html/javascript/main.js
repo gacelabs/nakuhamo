@@ -35,7 +35,7 @@ $(document).ready(function () {
 	$(window).resize(); */
 
 	$('#start-speak-btn').click(function () {
-		console.log(isSpeaking);
+		// console.log(isSpeaking);
 		if (isSpeaking == false) {
 			const text = $('#translated-text').text();
 			if (text.trim() === '') {
@@ -58,6 +58,7 @@ $(document).ready(function () {
 		} else {
 			window.speechSynthesis.cancel();
 			isSpeaking = false;
+			showToast({ content: 'Speaker Stopped', type: 'info' });
 		}
 	});
 });
@@ -89,14 +90,14 @@ function speakNextChunk() {
 	}
 
 	var sLanguage = $("#dialect").attr('data-dialect');
-	console.log(sLanguage);
+	// console.log(sLanguage);
 
 	isSpeaking = true;
 	const chunk = speechQueue.shift();
 	const utterance = new SpeechSynthesisUtterance(chunk);
 	utterance.lang = sLanguage; // Set the language
 	utterance.onend = function () {
-		console.log(speechQueue, isSpeaking);
+		// console.log(speechQueue, isSpeaking);
 		isSpeaking = false;
 		return speakNextChunk();
 	};
