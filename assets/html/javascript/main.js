@@ -35,23 +35,66 @@ $(document).ready(function () {
 	$(window).resize(); */
 
 	$('#start-speak-btn').click(function () {
-		const text = $('#translated-text').text();
-		if (text.trim() === '') {
-			showToast({ content: 'Please enter some text to translate', type: 'bad' });
-			return;
-		}
-		let sLanguage = $("#dialect").attr('data-dialect');
-		window.speechSynthesis.cancel();
-
-		if (sLanguage) {
-			try {
-				console.log(sLanguage);
-				const utterance = new SpeechSynthesisUtterance(text);
-				utterance.lang = sLanguage; // Set the language
-				window.speechSynthesis.speak(utterance);
-			} catch (error) {
-				showToast({ content: error, type: 'bad' });
+		if (isSpeaking == false) {
+			const text = $('#translated-text').text();
+			if (text.trim() === '') {
+				showToast({ content: 'Please enter some text to translate', type: 'bad' });
+				return;
 			}
+			let sLanguage = $("#dialect").attr('data-dialect');
+			// Cancel any ongoing speech synthesis
+			window.speechSynthesis.cancel();
+	
+			if (sLanguage) {
+				try {
+					speechQueue = splitTextIntoChunks(text, MAX_CHUNK_LENGTH);
+					speakNextChunk();
+				} catch (error) {
+					showToast({ content: error, type: 'bad' });
+				}
+			}
+		} else {
+			window.speechSynthesis.cancel();
+			isSpeaking = false;
 		}
 	});
 });
+
+let speechQueue = [];
+let isSpeaking = false;
+const MAX_CHUNK_LENGTH = 200;
+
+function splitTextIntoChunks(text, maxLength) {
+	const chunks = [];
+	let start = 0;
+	while (start < text.length) {
+		let end = Math.min(start + maxLength, text.length);
+		if (end < text.length) {
+			while (end > start && !/\s/.test(text[end])) {
+				end--;
+			}
+		}
+		chunks.push(text.slice(start, end).trim());
+		start = end;
+	}
+	return chunks;
+}
+
+function speakNextChunk() {
+	if (speechQueue.length === 0 || !isSpeaking) {
+		isSpeaking = false;
+		return;
+	}
+
+	let sLanguage = $("#dialect").attr('data-dialect');
+	console.log(sLanguage);
+
+	isSpeaking = true;
+	const chunk = speechQueue.shift();
+	const utterance = new SpeechSynthesisUtterance(chunk);
+	utterance.lang = sLanguage; // Set the language
+	utterance.onend = function () {
+		speakNextChunk();
+	};
+	window.speechSynthesis.speak(utterance);
+}
