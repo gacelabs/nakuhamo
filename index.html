@@ -10,6 +10,7 @@
 		<link rel="stylesheet" href="assets/html/style/fonts.googleapis.css">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<link rel="stylesheet" href="assets/html/style/jquery-ui.css">
+		<link rel="stylesheet" href="assets/html/bootstrap/css/bootstrap.min.css" />
 		<link rel="stylesheet" href="assets/html/style/main.css">
 	</head>
 
@@ -131,10 +132,23 @@
 			}
 		</script>
 
+		<div class="toast-container position-fixed bottom-0 end-0 mb-3 me-3" style="z-index: 1000">
+			<div id="tc-toast" class="toast bg-primary text-white fade hide" role="alert" aria-live="assertive"
+				aria-atomic="true">
+				<div class="toast-header">
+					<img src="assets/icons/logo.png" alt="icon" class="rounded me-2" style="width: 16px; height: 16px;">
+					<strong class="me-auto">NakuhaMo</strong>
+					<!-- <small>11 mins ago</small> -->
+					<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+				</div>
+				<div class="toast-body text-center"></div>
+			</div>
+		</div>
 	</body>
 
 	<script src="assets/html/javascript/jquery-3.6.0.min.js"></script>
 	<script src="assets/html/javascript/jquery-ui.js"></script>
+	<script src="assets/html/bootstrap/js/bootstrap.bundle.min.js"></script>
 	<script src="assets/html/javascript/html2canvas.min.js"></script>
 	<script src="assets/html/javascript/tesseract.min.js"></script>
 	<script src="assets/html/javascript/jsonQ.js"></script>

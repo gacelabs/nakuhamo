@@ -1,5 +1,6 @@
 [
-  { "label": "Tagalog", "value": "Tagalog", "data": "tl" },
-  { "label": "Latin American Spanish", "value": "Latin American Spanish", "data": "es_419" },
-  { "label": "Brazilian Portuguese", "value": "Brazilian Portuguese", "data": "pt_BR" }
+  { "label": "Tagalog", "value": "Tagalog", "data": "tl", "dialect": "en-PH" },
+  { "label": "Latin American Spanish", "value": "Latin American Spanish", "data": "es_419", "dialect": "es-ES" },
+  { "label": "Brazilian Portuguese", "value": "Brazilian Portuguese", "data": "pt_BR", "dialect": "pt-BR" },
+  { "label": "Japanese", "value": "Japanese", "data": "ja", "dialect": "ja" }
 ]

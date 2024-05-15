@@ -6,6 +6,7 @@ $(document).ready(function () {
 		select: function (event, ui) {
 			// console.log(ui.item, this);
 			$(this).attr('data-value', ui.item.data);
+			$(this).attr('data-dialect', ui.item.dialect);
 			translateText($('#last-copied-text').val(), 'en', ui.item.data);
 		}
 	}).focus(function () {
@@ -32,4 +33,24 @@ $(document).ready(function () {
 		}
 	});
 	$(window).resize(); */
+
+	$('#start-speak-btn').click(function () {
+		const text = $('#translated-text').text();
+		if (text.trim() === '') {
+			showToast({ conten: 'Please enter some text to translate', type: 'bad' });
+			return;
+		}
+		let sLanguage = $("#dialect").attr('data-dialect');
+
+		if (sLanguage) {
+			try {
+				console.log(sLanguage);
+				const utterance = new SpeechSynthesisUtterance(text);
+				utterance.lang = sLanguage; // Set the language
+				window.speechSynthesis.speak(utterance);
+			} catch (error) {
+				showToast({ conten: error, type: 'bad' });
+			}
+		}
+	});
 });
