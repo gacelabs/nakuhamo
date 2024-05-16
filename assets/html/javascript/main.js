@@ -31,7 +31,7 @@ $(document).ready(function () {
 						var sDirection = $(this).parents('[id*=recent-languages-]').attr('id');
 						if (sDirection == 'recent-languages-right') {
 							// console.log(sDirection);
-							testTraslator();
+							testTranslator();
 						}
 					});
 				},
