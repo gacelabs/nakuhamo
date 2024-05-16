@@ -43,23 +43,26 @@ var detectLanguage = function() {
 					$('.left-text').attr('disabled', 'disabled');
 
 					setTimeout(() => {
-						$.get("/assets/data/translations.json", function (translations) {
-							for (var x in translations) {
-								var translation = translations[x];
-								if ($.inArray(translation.code, arCodes) >= 0) {
-									$('#recent-languages-left').find('button:not(.first-buts)').removeClass('active');
-									buttonFirstClone
-										.text(translation.label)
-										.attr({'data-dialect': translation.code})
-										.addClass('active added-btn')
-									;
-									if (mobileCheck()) {
-										$(".dialect:first").val(translation.label).attr('data-dialect', translation.code);
+						$.ajax({
+							url: "assets/data/translations.json",
+							dataType: "json",
+							success: function (translations) {
+								for (var x in translations) {
+									var translation = translations[x];
+									if ($.inArray(translation.code, arCodes) >= 0) {
+										$('#recent-languages-left').find('button:not(.first-buts)').removeClass('active');
+										buttonFirstClone
+											.text(translation.label)
+											.attr({ 'data-dialect': translation.code })
+											.addClass('active added-btn');
+										if (mobileCheck()) {
+											$(".dialect:first").val(translation.label).attr('data-dialect', translation.code);
+										}
 									}
 								}
+								$('.left-text').removeAttr('disabled');
 							}
-							$('.left-text').removeAttr('disabled');
-						}, "json");
+						});
 					}, 1000);
 				}
 			};
