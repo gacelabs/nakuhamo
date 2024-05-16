@@ -18,7 +18,7 @@
 		<!-- Navbar -->
 		<div class="w3-top">
 			<div class="w3-bar w3-theme w3-top w3-left-align w3-large">
-				<a class="w3-bar-item w3-button w3-right w3-hide-large w3-hover-white w3-large w3-theme-l1" href="javascript:void(0)" onclick="w3_open()"><i class="fa fa-bars"></i></a>
+				<a class="w3-bar-item w3-button w3-right w3-hide-large w3-hover-white w3-large w3-theme-l1" href="javascript:;" onclick="w3_open()"><i class="fa fa-bars"></i></a>
 				<a href="/" class="w3-bar-item w3-button w3-theme-l1">SpeakLanguage</a>
 				<!-- <a href="#" class="w3-bar-item w3-button w3-hide-small w3-hover-white">About</a>
 				<a href="#" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Values</a>
@@ -31,7 +31,7 @@
 
 		<!-- Sidebar -->
 		<nav class="w3-sidebar w3-bar-block w3-large w3-theme-l5 w3-animate-left w3-hide-large" id="mySidebar" style="display: none;">
-			<a href="javascript:void(0)" onclick="w3_close()" class="w3-right w3-xlarge w3-padding-large w3-hover-black w3-hide-large" title="Close Menu">
+			<a href="javascript:;" onclick="w3_close()" class="w3-right w3-xlarge w3-padding-large w3-hover-black w3-hide-large" title="Close Menu">
 				<i class="fa fa-remove"></i>
 			</a>
 			<h4 class="w3-bar-item"><b>Saved Rocords</b></h4>
@@ -47,33 +47,69 @@
 
 		<!-- Main content: shift it to the right by 250 pixels when the sidebar is visible -->
 		<div class="w3-main">
-			<div class="w3-row w3-padding-64" style="padding-bottom: 32px !important;">
-				<div class="w3-twothird w3-container">
+			<div class="w3-row w3-padding-64" style="padding-bottom: 0px !important;">
+				<div class="w3-half" style="height: 220px;">
 					<div style="position: relative;">
-						<h1 class="w3-text-teal" style="width: max-content;">Text to translate:</h1> 
-						<a class="w3-bar-item w3-button w3-right w3-hover-white w3-theme" href="javascript:void(0)" id="start-record-btn" style="border-radius: 50%; margin: -50px 0 10px;"><i class="fa fa-microphone"></i></a>
+						<div class="ui-widget" style="padding: 10px;">
+							<div id="recent-languages-left" class="btn-group" role="group" aria-label="Button group with nested dropdown">
+								<button type="button" class="first-buts btn btn-secondary d-none d-xl-block d-md-block hide" style="height: 35px;">English</button>
+								<div class="btn-group" role="group">
+									<div class="input-group">
+										<input type="search" value="" data-index="left" class="dialect w3-border ui-autocomplete-input" placeholder="Select Language" autocomplete="off">
+										<div class="input-group-text d-xl-none d-md-none" id="btnGroupAddon" style="height: 35px;"><i class="fa fa-arrow-right"></i></div>
+										<input type="search" value="" data-index="right" class="dialect w3-border ui-autocomplete-input w3-right d-xl-none d-md-none" placeholder="Select Language" autocomplete="off">
+									</div>
+								</div>
+							</div>
+
+							<a class="w3-right w3-small w3-padding-small clear-text-btn" href="javascript:;" title="Clear Text">
+								<i class="fa fa-remove" style="color: coral;"></i>
+							</a>
+							<textarea class="w3-border left-text" placeholder="Enter text here..."></textarea>
+							
+							<div id="action-panel-left">
+								<a class="w3-right start-speak-btn" href="javascript:;">
+									<i class="fa fa-volume-up"></i>
+								</a>
+								<a class="w3-right start-record-btn" href="javascript:;">
+									<i class="fa fa-microphone"></i>
+								</a>
+							</div>
+						</div>
 					</div>
-					<textarea id="last-copied-text" class="w3-border" placeholder="No detected text copied to clipboard yet!" style="width: 100%; height: 195px; padding: 5px;"></textarea>
 				</div>
-				<div class="w3-third w3-container">
-					<p class="w3-border w3-padding-large w3-padding-32 w3-center">AD</p>
-					<p class="w3-border w3-padding-large w3-padding-64 w3-center">AD</p>
+				<div class="w3-half">
+					<div style="position: relative;">
+						<div class="ui-widget" style="padding: 10px;">
+							<div id="recent-languages-right" class="btn-group" role="group" aria-label="Button group with nested dropdown">
+								<button type="button" class="first-buts btn btn-secondary d-none d-xl-block d-md-block hide" style="height: 35px;">English</button>
+								<div class="btn-group" role="group">
+									<div class="input-group">
+										<input type="search" value="" data-index="right" class="dialect w3-border ui-autocomplete-input d-none d-xl-block d-md-block" placeholder="Select Language" autocomplete="off">
+									</div>
+								</div>
+							</div>
+							
+							<a class="w3-right w3-small w3-padding-small clear-text-btn" href="javascript:;" title="Clear Text">
+								<i class="fa fa-remove"></i>
+							</a>
+							<textarea class="w3-border right-text" placeholder="Translation shown here.." disabled=""></textarea>
+
+							<div id="action-panel-left">
+								<a class="w3-right start-share-btn" href="javascript:;">
+									<i class="fa fa-share-alt"></i>
+								</a>
+								<a class="w3-right start-speak-btn" href="javascript:;">
+									<i class="fa fa-volume-up"></i>
+								</a>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 
 			<div class="w3-row">
-				<div class="w3-twothird w3-container">
-					<div class="ui-widget">
-						<label for="birds">Select a dialect: </label>
-						<input id="dialect" value="" class="w3-border" />
-					</div>
-					<div style="position: relative;">
-						<h1 class="w3-text-teal">Translated text:</h1>
-						<a class="w3-bar-item w3-button w3-right w3-hover-white w3-theme" href="javascript:void(0)" id="start-speak-btn" style="border-radius: 50%; margin: -50px 0 10px;"><i class="fa fa-volume-up"></i></a>
-					</div>
-					<p id="translated-text">No translated text yet!</p>
-				</div>
-				<div class="w3-third w3-container">
+				<div class="w3-block w3-container">
 					<p class="w3-border w3-padding-large w3-padding-32 w3-center">AD</p>
 					<p class="w3-border w3-padding-large w3-padding-64 w3-center">AD</p>
 				</div>

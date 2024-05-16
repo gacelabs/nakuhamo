@@ -6,7 +6,7 @@ var detectClipboard = async function() {
 		if (permission.state === 'granted' || permission.state === 'prompt') {
 			// Read the text from the clipboard
 			const text = await navigator.clipboard.readText();
-			$('#last-copied-text').text(text);
+			$('.left-text').text(text);
 			// console.log(detectLanguage(text));
 			// translateText(text, 'en', 'es');
 		} else {
@@ -20,9 +20,9 @@ var detectClipboard = async function() {
 var detectLanguage = function() {
 	try {
 		$.get("https://ipinfo.io", function (ipinfo) {
-			console.log(ipinfo);
+			// console.log(ipinfo);
 			var fnCall = function (tz_languages) {
-				console.log(tz_languages);
+				// console.log(tz_languages);
 				var oLanguages = new JSONQuery(tz_languages);
 				var query = {
 					select: { fields: '*' },
@@ -33,7 +33,35 @@ var detectLanguage = function() {
 					}
 				};
 				var result = oLanguages.execute(query);
-				console.log(result);
+
+				if (result.data.length) {
+					var oData = result.data[0];
+					// console.log(oData, oData.language_codes.split(','));
+					var arCodes = oData.language_codes.split(',');
+					var buttonFirst = $('#recent-languages-left').find('button.first-buts');
+					var buttonFirstClone = buttonFirst.clone(true).text('Detecting language...').removeClass('hide first-buts').insertAfter(buttonFirst);
+					$('.left-text').attr('disabled', 'disabled');
+
+					setTimeout(() => {
+						$.get("/assets/data/translations.json", function (translations) {
+							for (var x in translations) {
+								var translation = translations[x];
+								if ($.inArray(translation.code, arCodes) >= 0) {
+									$('#recent-languages-left').find('button:not(.first-buts)').removeClass('active');
+									buttonFirstClone
+										.text(translation.label)
+										.attr({'data-dialect': translation.code})
+										.addClass('active added-btn')
+									;
+									if (mobileCheck()) {
+										$(".dialect:first").val(translation.label).attr('data-dialect', translation.code);
+									}
+								}
+							}
+							$('.left-text').removeAttr('disabled');
+						}, "json");
+					}, 1000);
+				}
 			};
 			$.get("/assets/data/languages-tz.json", fnCall, "json");
 		}, "json");
@@ -55,16 +83,17 @@ var translateText = function (text, sourceLang, targetLang) {
 			q: text
 		},
 		success: function (response) {
-			// console.log(response);
+			console.log(response);
 			if (response && response[0] && response[0]) {
 				var sTranslated = '';
 				response[0].forEach(element => {
 					// console.log(element);
 					sTranslated += element[0];
 				});
-				$('#translated-text').text(sTranslated);
+				$('.right-text').text(sTranslated);
 			} else {
 				console.error('Failed to translate text.');
+				showToast({ content: 'Please enter text or talk to translate', type: 'bad' });
 			}
 		},
 		error: function (xhr, status, error) {
@@ -78,6 +107,9 @@ String.prototype.ucWords = function () {
 		return letter.toUpperCase();
 	});
 }
+
+String.prototype.lines = function () { return this.split(/\r*\n/); }
+String.prototype.lineCount = function () { return this.lines().length; }
 
 window.mobileCheck = function () {
 	let check = false;
@@ -191,10 +223,10 @@ var requestPermission = function (origin_data, dest_data) {
 	Notification.requestPermission().then(permFn);
 }
 
-var recordText = function() {
-	const startRecordBtn = $('#start-record-btn');
-	const startSpeakBtn = $('#start-speak-btn');
-	const capturedTextDiv = $('#last-copied-text');
+var runRecordText = function() {
+	const startRecordBtn = $('.start-record-btn');
+	const startSpeakBtn = $('.start-speak-btn');
+	const capturedTextDiv = $('.left-text');
 	var recognizedText = '';
 
 	let recognition;
@@ -203,7 +235,7 @@ var recordText = function() {
 	} else if ('SpeechRecognition' in window) {
 		recognition = new SpeechRecognition();
 	} else {
-		alert('Your browser does not support speech recognition. Please try this in Google Chrome.');
+		showToast({ content: 'Your browser does not support speech recognition. Please try this in Google Chrome.', type: 'bad' });
 		return;
 	}
 
@@ -213,20 +245,20 @@ var recordText = function() {
 
 	recognition.onstart = function () {
 		startRecordBtn.attr('data-recording', 1);
-		startRecordBtn.css({ 'background':'red !important' });
-		startSpeakBtn.css({ 'pointer-events':'none', 'background':'gray !important' });
-		$('#translated-text').text('Listening...');
+		$('.right-text').text('Listening...');
 	};
 
 	recognition.onresult = function (event) {
-		startRecordBtn.css({ 'background': '' });
-		startSpeakBtn.css({ 'background': '' });
+		startRecordBtn.css({ 'color': '' });
+		startSpeakBtn.css({ 'color': '' });
 		console.log(event.results);
 		recognizedText += event.results[0][0].transcript;
 	};
 	
 	recognition.onerror = function (event) {
-		capturedTextDiv.text('Error occurred in recognition: ' + event.error);
+		console.error(event.error);
+		recognition.stop();
+		showToast({ content: 'Error occurred in recognition: ' + event.error, type: 'bad' });
 	};
 	
 	recognition.onend = function () {
@@ -236,6 +268,8 @@ var recordText = function() {
 	};
 
 	startRecordBtn.click(function () {
+		startRecordBtn.css({ 'color': 'red !important' });
+		startSpeakBtn.css({ 'pointer-events': 'none', 'color': 'gray !important' });
 		if (startRecordBtn.attr('data-recording') != 1) {
 			recognition.start();
 			console.log("recorder started");
@@ -250,7 +284,24 @@ var recordText = function() {
 	}); */
 }
 
-var recordVoice = function (record, stop) {
+var recordVoice = function (e) {
+	if (navigator.mediaDevices) {
+		console.log("getUserMedia supported.");
+		const constraints = { audio: true };
+		let chunks = [];
+
+		navigator.mediaDevices
+		.getUserMedia(constraints)
+		.then((stream) => {
+			const mediaRecorder = new MediaRecorder(stream);
+			speakNow(mediaRecorder, chunks);
+		}).catch((err) => {
+			console.error(`The following error occurred: ${err}`);
+		});
+	}
+}
+
+var recordVoiceV1 = function (record, stop) {
 	if (navigator.mediaDevices) {
 		console.log("getUserMedia supported.");
 
@@ -313,6 +364,17 @@ var recordVoice = function (record, stop) {
 				const audioURL = URL.createObjectURL(blob);
 				audio.src = audioURL;
 				console.log("recorder stopped");
+
+				/* const a = document.createElement("a");
+				a.href = audioURL;
+				a.download = "myAudio.mp3";
+				document.body.appendChild(a);
+			
+				console.log(a);
+			
+				a.click();
+				URL.revokeObjectURL(audioURL);
+				a.remove(); */
 
 				deleteButton.onclick = (e) => {
 					const evtTgt = e.target;
@@ -378,3 +440,111 @@ var recordVoiceWaves = function () {
 
 	input.addEventListener("input", drawToCanvas);
 }
+
+var speechQueue = [];
+var isSpeaking = false;
+var MAX_CHUNK_LENGTH = 200;
+
+var speakNow = function (recorder, chunks) {
+	// console.log(isSpeaking);
+	if (isSpeaking == false) {
+		var text = $('.right-text').text();
+		if (text.trim() === '') {
+			showToast({ content: 'Please enter text or talk to translate', type: 'bad' });
+			return;
+		}
+		// Cancel any ongoing speech synthesis
+		window.speechSynthesis.cancel();
+
+		try {
+			if (speechQueue.length == 0) {
+				speechQueue = splitTextIntoChunks(text, MAX_CHUNK_LENGTH);
+			} else {
+				isSpeaking = false;
+			}
+			speakChunks(recorder, chunks);
+		} catch (error) {
+			showToast({ content: error, type: 'bad' });
+		}
+	} else {
+		window.speechSynthesis.cancel();
+		isSpeaking = false;
+		showToast({ content: 'Speaker Stopped', type: 'info' });
+	}
+}
+
+function splitTextIntoChunks(text, maxLength) {
+	var chunks = [];
+	var start = 0;
+	while (start < text.length) {
+		var end = Math.min(start + maxLength, text.length);
+		if (end < text.length) {
+			while (end > start && !/\s/.test(text[end])) {
+				end--;
+			}
+		}
+		chunks.push(text.slice(start, end).trim());
+		start = end;
+	}
+	return chunks;
+}
+
+function speakChunks(recorder, chunks) {
+	recorder.onstart = () => {
+		speakNext(recorder);
+	};
+
+	recorder.onstop = async (e) => {
+		console.log("data available after recorder.stop() called.");
+		const blob = new Blob(chunks, { type: "audio/mp3; codecs=opus" });
+		chunks = [];
+		const audioURL = URL.createObjectURL(blob);
+		console.log("recorder stopped", audioURL);
+
+		var response = await fetch(audioURL);
+		var blobFile = await response.blob();
+		var file = new File([blobFile], 'translated.mp3', { type: blobFile.type });
+
+		if (navigator.share) {
+			await navigator.share({
+				files: [file],
+				title: 'Share Translated Audio',
+				// text: comments.value
+			});
+		} else {
+			// Web Share API is not supported
+			console.error('Web Share API is not supported.');
+		}
+	};
+
+	recorder.ondataavailable = (e) => {
+		chunks.push(e.data);
+	};
+
+	recorder.start();
+}
+
+function speakNext(recorder) {
+	if (speechQueue.length === 0 || isSpeaking) {
+		isSpeaking = false;
+		return;
+	}
+	var sLanguage = $(".dialect[data-index=right]").attr('data-dialect');
+	sLanguage = (sLanguage == undefined) ? $('#recent-languages-right').find('button.active').attr('data-dialect') : sLanguage;
+	// console.log(sLanguage);
+
+	isSpeaking = true;
+	var chunk = speechQueue.shift();
+	var utterance = new SpeechSynthesisUtterance(chunk);
+	utterance.lang = sLanguage; // Set the language
+	utterance.onend = function () {
+		// console.log(speechQueue, isSpeaking);
+		isSpeaking = false;
+		if (chunk.trim().length == 0) {
+			recorder.stop();
+		}
+		return speakNext(recorder);
+	};
+	window.speechSynthesis.speak(utterance);
+}
+
