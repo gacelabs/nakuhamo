@@ -90,7 +90,7 @@ var translateText = function (text, sourceLang, targetLang) {
 			q: text
 		},
 		success: function (response) {
-			console.log(response);
+			// console.log(response);
 			if (response && response[0] && response[0]) {
 				var sTranslated = '';
 				response[0].forEach(element => {
