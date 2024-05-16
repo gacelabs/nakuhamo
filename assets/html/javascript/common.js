@@ -275,9 +275,9 @@ var runRecordText = function() {
 	};
 
 	startRecordBtn.click(function () {
-		startRecordBtn.css({ 'color': 'red !important' });
-		startSpeakBtn.css({ 'pointer-events': 'none', 'color': 'gray !important' });
 		if (startRecordBtn.attr('data-recording') != 1) {
+			startRecordBtn.css({ 'color': 'red' });
+			startSpeakBtn.css({ 'pointer-events': 'none', 'color': 'gray' });
 			recognition.start();
 			console.log("recorder started");
 		} else {
@@ -448,55 +448,7 @@ var recordVoiceWaves = function () {
 	input.addEventListener("input", drawToCanvas);
 }
 
-var speechQueue = [];
-var isSpeaking = false;
-var MAX_CHUNK_LENGTH = 200;
-
-var speakNow = function (recorder, chunks) {
-	// console.log(isSpeaking);
-	if (isSpeaking == false) {
-		var text = $('.right-text').text();
-		if (text.trim() === '') {
-			showToast({ content: 'Please enter text or talk to translate', type: 'bad' });
-			return;
-		}
-		// Cancel any ongoing speech synthesis
-		window.speechSynthesis.cancel();
-
-		try {
-			if (speechQueue.length == 0) {
-				speechQueue = splitTextIntoChunks(text, MAX_CHUNK_LENGTH);
-			} else {
-				isSpeaking = false;
-			}
-			speakChunks(recorder, chunks);
-		} catch (error) {
-			showToast({ content: error, type: 'bad' });
-		}
-	} else {
-		window.speechSynthesis.cancel();
-		isSpeaking = false;
-		showToast({ content: 'Speaker Stopped', type: 'info' });
-	}
-}
-
-function splitTextIntoChunks(text, maxLength) {
-	var chunks = [];
-	var start = 0;
-	while (start < text.length) {
-		var end = Math.min(start + maxLength, text.length);
-		if (end < text.length) {
-			while (end > start && !/\s/.test(text[end])) {
-				end--;
-			}
-		}
-		chunks.push(text.slice(start, end).trim());
-		start = end;
-	}
-	return chunks;
-}
-
-function speakChunks(recorder, chunks) {
+function runVoiceRecorder(recorder, chunks) {
 	recorder.onstart = () => {
 		speakNext(recorder);
 	};
@@ -531,6 +483,116 @@ function speakChunks(recorder, chunks) {
 	recorder.start();
 }
 
+var speechQueue = [];
+var isSpeaking = false;
+var MAX_CHUNK_LENGTH = 200;
+
+var speakNow = function (e) {
+	// console.log(isSpeaking);
+	if (isSpeaking == false) {
+		var isRight = true;
+		if ($(e.target).parents('[id*=action-panel-]').attr('id') == 'action-panel-right') {
+			var text = $('.right-text').text();
+			var sLanguage = $(".dialect[data-index=right]").attr('data-dialect');
+			sLanguage = (sLanguage == undefined) ? $('#recent-languages-right').find('button.active').attr('data-dialect') : sLanguage;
+		} else {
+			isRight = false;
+			var text = $('.left-text').val();
+			var sLanguage = $(".dialect[data-index=left]").attr('data-dialect');
+			sLanguage = (sLanguage == undefined) ? $('#recent-languages-left').find('button.active').attr('data-dialect') : sLanguage;
+		}
+		// console.log(sLanguage);
+		if (text.trim() === '') {
+			if (sLanguage == undefined) {
+				showToast({ content: 'Please select a language ' + (isRight ? 'target' : 'source'), type: 'bad' });
+			} else {
+				showToast({ content: 'Please enter text or talk to translate', type: 'bad' });
+			}
+			return;
+		}
+		// Cancel any ongoing speech synthesis
+		window.speechSynthesis.cancel();
+
+		try {
+			if (speechQueue.length == 0) {
+				speechQueue = splitTextIntoChunks(text, MAX_CHUNK_LENGTH);
+			} else {
+				isSpeaking = false;
+			}
+			speakNextChunk(sLanguage);
+		} catch (error) {
+			showToast({ content: error, type: 'bad' });
+		}
+	} else {
+		window.speechSynthesis.cancel();
+		isSpeaking = false;
+		showToast({ content: 'Speaker Stopped', type: 'info' });
+	}
+}
+
+function splitTextIntoChunks(text, maxLength) {
+	var chunks = [];
+	var start = 0;
+	while (start < text.length) {
+		var end = Math.min(start + maxLength, text.length);
+		if (end < text.length) {
+			while (end > start && !/\s/.test(text[end])) {
+				end--;
+			}
+		}
+		chunks.push(text.slice(start, end).trim());
+		start = end;
+	}
+	return chunks;
+}
+
+function speakNextChunk(sLanguage) {
+	if (speechQueue.length === 0 || isSpeaking) {
+		isSpeaking = false;
+		return;
+	}
+
+	isSpeaking = true;
+	var chunk = speechQueue.shift();
+	var utterance = new SpeechSynthesisUtterance(chunk);
+	utterance.lang = sLanguage; // Set the language
+	utterance.onend = function () {
+		// console.log(speechQueue, isSpeaking);
+		isSpeaking = false;
+		return speakNextChunk();
+	};
+	window.speechSynthesis.speak(utterance);
+}
+
+var speakNowV2 = function (recorder, chunks) {
+	// console.log(isSpeaking);
+	if (isSpeaking == false) {
+		var text = $('.right-text').text();
+		if (text.trim() === '') {
+			showToast({ content: 'Please enter text or talk to translate', type: 'bad' });
+			return;
+		}
+		// Cancel any ongoing speech synthesis
+		window.speechSynthesis.cancel();
+
+		try {
+			if (speechQueue.length == 0) {
+				speechQueue = splitTextIntoChunks(text, MAX_CHUNK_LENGTH);
+			} else {
+				isSpeaking = false;
+			}
+			// runVoiceRecorder(recorder, chunks);
+			speakNext(undefined, chunks);
+		} catch (error) {
+			showToast({ content: error, type: 'bad' });
+		}
+	} else {
+		window.speechSynthesis.cancel();
+		isSpeaking = false;
+		showToast({ content: 'Speaker Stopped', type: 'info' });
+	}
+}
+
 function speakNext(recorder) {
 	if (speechQueue.length === 0 || isSpeaking) {
 		isSpeaking = false;
@@ -547,7 +609,7 @@ function speakNext(recorder) {
 	utterance.onend = function () {
 		// console.log(speechQueue, isSpeaking);
 		isSpeaking = false;
-		if (chunk.trim().length == 0) {
+		if (recorder && speechQueue.length == 0) {
 			recorder.stop();
 		}
 		return speakNext(recorder);
