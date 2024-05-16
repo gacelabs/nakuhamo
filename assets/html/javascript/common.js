@@ -63,7 +63,11 @@ var detectLanguage = function() {
 					}, 1000);
 				}
 			};
-			$.get("/assets/data/languages-tz.json", fnCall, "json");
+			$.ajax({
+				url: "assets/data/languages-tz.json",
+				dataType: "json",
+				success: fnCall
+			});
 		}, "json");
 	} catch (err) {
 		console.error('Failed to read clipboard contents: ', err);
