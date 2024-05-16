@@ -31,24 +31,7 @@ $(document).ready(function () {
 						var sDirection = $(this).parents('[id*=recent-languages-]').attr('id');
 						if (sDirection == 'recent-languages-right') {
 							// console.log(sDirection);
-							var sl = $(".dialect[data-index=left]").attr('data-dialect');
-							sl = (sl == undefined) ? $('#recent-languages-left').find('button.active').attr('data-dialect') : sl;
-							var tl = $(".dialect[data-index=right]").attr('data-dialect');
-							tl = (tl == undefined) ? $('#recent-languages-right').find('button.active').attr('data-dialect') : tl;
-							
-							if (sl != undefined && tl != undefined) {
-								translateText($('.left-text').val(), sl, tl);
-							} else {
-								if (sl == undefined && tl == undefined) {
-									showToast({ content: 'Please select a languages to complete translation', type: 'bad' });
-								} else {
-									if (sl == undefined && tl != undefined) {
-										showToast({ content: 'Please select a language source', type: 'bad' });
-									} else if (sl != undefined && tl == undefined) {
-										showToast({ content: 'Please select a language target', type: 'bad' });
-									}
-								}
-							}
+							testTraslator();
 						}
 					});
 				},

@@ -258,8 +258,8 @@ var runRecordText = function() {
 	recognition.onresult = function (event) {
 		startRecordBtn.css({ 'color': '' });
 		startSpeakBtn.css({ 'color': '' });
-		console.log(event.results);
 		recognizedText += event.results[0][0].transcript;
+		console.log(recognizedText);
 	};
 	
 	recognition.onerror = function (event) {
@@ -271,7 +271,9 @@ var runRecordText = function() {
 	recognition.onend = function () {
 		startSpeakBtn.css({ 'pointer-events':'' });
 		startRecordBtn.removeAttr('data-recording');
-		capturedTextDiv.text(recognizedText);
+		capturedTextDiv.val(recognizedText);
+		$('.right-text').text('');
+		testTranslator();
 	};
 
 	startRecordBtn.click(function () {
@@ -289,6 +291,27 @@ var runRecordText = function() {
 	/* startSpeakBtn.click(function () {
 		recognition.stop();
 	}); */
+}
+
+var testTranslator = function () {
+	var sl = $(".dialect[data-index=left]").attr('data-dialect');
+	sl = (sl == undefined) ? $('#recent-languages-left').find('button.active').attr('data-dialect') : sl;
+	var tl = $(".dialect[data-index=right]").attr('data-dialect');
+	tl = (tl == undefined) ? $('#recent-languages-right').find('button.active').attr('data-dialect') : tl;
+
+	if (sl != undefined && tl != undefined) {
+		translateText($('.left-text').val(), sl, tl);
+	} else {
+		if (sl == undefined && tl == undefined) {
+			showToast({ content: 'Please select a languages to complete translation', type: 'bad' });
+		} else {
+			if (sl == undefined && tl != undefined) {
+				showToast({ content: 'Please select a language source', type: 'bad' });
+			} else if (sl != undefined && tl == undefined) {
+				showToast({ content: 'Please select a language target', type: 'bad' });
+			}
+		}
+	}
 }
 
 var recordVoice = function (e) {
