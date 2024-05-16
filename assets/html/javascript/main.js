@@ -54,21 +54,25 @@ $(document).ready(function () {
 	
 	var actualClientHeight = $('textarea:first').get(0).clientHeight
 	$('textarea').on('keypress', function (e) {
-		if (e.keyCode == 13 || this.clientHeight < this.scrollHeight) {
-			var height = parseInt($(this).css('height'));
-			$('textarea').css('height', height + 30 + 'px');
+		if (mobileCheck() == false) {
+			if (e.keyCode == 13 || this.clientHeight < this.scrollHeight) {
+				var height = parseInt($(this).css('height'));
+				$('textarea').css('height', height + 30 + 'px');
+			}
 		}
 	}).on('keydown', function (e) {
-		if (e.keyCode == 8 || e.keyCode == 46) {
-			if (this.clientHeight > actualClientHeight) {
-				var height = parseInt($(this).css('height'));
-				$('textarea').css('height', height - 30 + 'px');
-			} else if (this.clientHeight < actualClientHeight) {
-				$('textarea').css('height', actualClientHeight + 'px');
-			}
-
-			if ($(this).val().length == 0) {
-				$(this).prev('.clear-text-btn').hide();
+		if (mobileCheck() == false) {
+			if (e.keyCode == 8 || e.keyCode == 46) {
+				if (this.clientHeight > actualClientHeight) {
+					var height = parseInt($(this).css('height'));
+					$('textarea').css('height', height - 30 + 'px');
+				} else if (this.clientHeight < actualClientHeight) {
+					$('textarea').css('height', actualClientHeight + 'px');
+				}
+	
+				if ($(this).val().length == 0) {
+					$(this).prev('.clear-text-btn').hide();
+				}
 			}
 		}
 	}).on('input', function (e) {
@@ -76,9 +80,9 @@ $(document).ready(function () {
 	});
 	
 	$('.clear-text-btn').on('click', function (e) {
-		$(this).next('textarea').val('');
-		$(this).hide();
+		$('textarea').val('');
 		$('textarea').css('height', actualClientHeight + 'px');
+		$(this).hide();
 	});
 
 	detectLanguage();
