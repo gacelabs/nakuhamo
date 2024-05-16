@@ -65,9 +65,9 @@ a:hover.start-speak-btn, a:hover.start-record-btn, a:hover.start-share-btn {
 }
 
 .clear-text-btn {
-	position: relative;
-	top: 42px;
-	right: 0%;
+	position: absolute;
+	top: 50px;
+	right: 10PX;
 	color: coral;
 	display: none;
 }
