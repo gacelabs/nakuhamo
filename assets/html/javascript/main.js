@@ -55,7 +55,7 @@ $(document).ready(function () {
 						} else {
 							var buttonAll = $('#recent-languages-right').find('button:not(.first-buts)');
 						}
-						if (buttonAll.length <= 4) {
+						if (buttonAll.length != 4) {
 							$(this).val('');
 						}
 					}
@@ -127,7 +127,12 @@ $(document).ready(function () {
 
 	detectLanguage();
 	runRecordText();
-	$('.start-speak-btn').on('click', speakNow);
+	$('.start-speak-btn').on('click', function (e) {
+		if ($(this).prop('tagName') != 'A') {
+			e = $(this).parent('a').get(0);
+		}
+		speakNow(e);
+	});
 
 	/* $('.left-text').on('click', function (e) {
 		var sText = detectClipboard();
