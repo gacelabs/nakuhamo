@@ -39,10 +39,10 @@ $(document).ready(function () {
 							var sDirection = $(this).parents('[id*=recent-languages-]').attr('id');
 							if (sDirection == 'recent-languages-right') {
 								// console.log(sDirection);
-								$('.dialect[data-index="right"]').val('').removeAttr('data-dialect');
+								$('.dialect[data-index="right"]').val('');
 								testTranslator();
 							} else {
-								$('.dialect[data-index="left"]').val('').removeAttr('data-dialect');
+								$('.dialect[data-index="left"]').val('');
 								var sl = currentActive.attr('data-dialect');
 								var tl = $(this).attr('data-dialect');
 								translateText($('.left-text').val(), sl, tl, true);
