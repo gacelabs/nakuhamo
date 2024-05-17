@@ -144,6 +144,7 @@ function urlParams() {
 	return url.searchParams;
 }
 
+var isMessageSpeaking = false;
 function showToast(params) {
 	let toastClone = $('#tc-toast').clone().removeAttr('id');
 	toastClone.find('.toast-body').html(params.content);
@@ -165,9 +166,21 @@ function showToast(params) {
 	$('.toast-container').prepend(toastClone);
 	toastClone.toast({ delay: 13000 });
 	toastClone.toast('show');
+
 	if (typeof params.closure == 'function') {
 		params.closure();
 	}
+
+	window.speechSynthesis.cancel();
+	if (isMessageSpeaking) {
+		isMessageSpeaking = false;
+		return;
+	}
+	isMessageSpeaking = true;
+	var utterance = new SpeechSynthesisUtterance(params.content);
+	utterance.lang = 'en'; // Set the language
+	utterance.onend = function () { isMessageSpeaking = false; };
+	window.speechSynthesis.speak(utterance);
 }
 
 function showNotification(title, body, redirectUrl) {
@@ -518,7 +531,7 @@ var speakNow = function (e) {
 			var text = $('.right-text').text();
 			var sLanguage = $(".dialect[data-index=right]").attr('data-dialect');
 			sLanguage = (sLanguage == undefined) ? $('#recent-languages-right').find('button.active').attr('data-dialect') : sLanguage;
-		} else {
+		} else if ($(e.target).parents('[id*=action-panel-]').attr('id') == 'action-panel-left') {
 			isRight = false;
 			var text = $('.left-text').val();
 			var sLanguage = $(".dialect[data-index=left]").attr('data-dialect');
