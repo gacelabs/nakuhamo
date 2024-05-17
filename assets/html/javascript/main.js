@@ -69,42 +69,34 @@ $(document).ready(function () {
 				$('textarea').css('height', height + 30 + 'px');
 			}
 		}
-		if ($(this).val().trim().length == 0) {
-			$(this).prev('.clear-text-btn').hide();
-		}
 	}).on('keydown', function (e) {
 		if (mobileCheck() == false) {
 			if (e.keyCode == 8 || e.keyCode == 46) {
 				if (this.clientHeight > actualClientHeight) {
 					var height = parseInt($(this).css('height'));
 					$('textarea').css('height', height - 30 + 'px');
-				} else if (this.clientHeight < actualClientHeight) {
-					$('textarea').css('height', actualClientHeight + 'px');
 				}
 			}
 		}
 		if ($(this).val().trim().length == 0) {
 			$(this).prev('.clear-text-btn').hide();
+			$('textarea').css('height', actualClientHeight + 'px');
 		}
 	}).on('paste', function (e) {
 		if (mobileCheck() == false) {
 			var height = parseInt($(this).css('height'));
 			$('textarea').css('height', height + 30 + 'px');
 		}
-		if ($(this).val().trim().length == 0) {
-			$(this).prev('.clear-text-btn').hide();
-		}
 	}).on('cut', function (e) {
 		if (mobileCheck() == false) {
 			if (this.clientHeight > actualClientHeight) {
 				var height = parseInt($(this).css('height'));
 				$('textarea').css('height', height - 30 + 'px');
-			} else {
-				$('textarea').css('height', actualClientHeight + 'px');
 			}
 		}
 		if ($(this).val().trim().length == 0) {
 			$(this).prev('.clear-text-btn').hide();
+			$('textarea').css('height', actualClientHeight + 'px');
 		}
 	}).on('input', function (e) {
 		$(this).prev('.clear-text-btn').show();
@@ -118,6 +110,7 @@ $(document).ready(function () {
 		} else {
 			$('textarea').val('');
 			$(this).prev('.clear-text-btn').hide();
+			$('textarea').css('height', actualClientHeight + 'px');
 		}
 	});
 	
