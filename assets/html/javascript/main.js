@@ -39,11 +39,12 @@ $(document).ready(function () {
 							var sDirection = $(this).parents('[id*=recent-languages-]').attr('id');
 							if (sDirection == 'recent-languages-right') {
 								// console.log(sDirection);
-								$('.dialect[data-index="right"]').val('');
+								// $('.dialect[data-index="right"]').val('');
 								testTranslator();
 							} else {
-								$('.dialect[data-index="left"]').val('');
+								// $('.dialect[data-index="left"]').val('');
 								var sl = currentActive.attr('data-dialect');
+								sl = (sl == undefined) ? $(".dialect[data-index=left]").attr('data-dialect') : sl;
 								var tl = $(this).attr('data-dialect');
 								translateText($('.left-text').val(), sl, tl, true);
 							}
@@ -86,6 +87,7 @@ $(document).ready(function () {
 			}
 		}
 		if ($(this).val().trim().length == 0) {
+			$(this).prev('.clear-text-btn').trigger('click');
 			$(this).prev('.clear-text-btn').hide();
 			$('textarea').css('height', actualClientHeight + 'px');
 		}
@@ -102,6 +104,7 @@ $(document).ready(function () {
 			}
 		}
 		if ($(this).val().trim().length == 0) {
+			$(this).prev('.clear-text-btn').trigger('click');
 			$(this).prev('.clear-text-btn').hide();
 			$('textarea').css('height', actualClientHeight + 'px');
 		}
