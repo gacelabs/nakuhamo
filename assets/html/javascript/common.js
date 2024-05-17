@@ -1,4 +1,4 @@
-var detectClipboard = async function() {
+var detectClipboard = async function () {
 	try {
 		// Request permission to read from the clipboard
 		const permission = await navigator.permissions.query({ name: 'clipboard-read' });
@@ -17,7 +17,7 @@ var detectClipboard = async function() {
 	}
 }
 
-var detectLanguage = function() {
+var detectLanguage = function () {
 	try {
 		$.get("https://ipinfo.io", function (ipinfo) {
 			// console.log(ipinfo);
@@ -77,7 +77,7 @@ var detectLanguage = function() {
 	}
 }
 
-var translateText = function (text, sourceLang, targetLang) {
+var translateText = function (text, sourceLang, targetLang, isLeft) {
 	$.ajax({
 		url: 'https://translate.googleapis.com/translate_a/single',
 		type: 'GET',
@@ -89,6 +89,12 @@ var translateText = function (text, sourceLang, targetLang) {
 			dt: 't',
 			q: text
 		},
+		timeout: 30000,
+		beforeSend: function () {
+			if (isLeft == undefined && text.trim().length) {
+				$('.right-text').val('Translating...');
+			}
+		},
 		success: function (response) {
 			// console.log(response);
 			if (response && response[0] && response[0]) {
@@ -97,10 +103,15 @@ var translateText = function (text, sourceLang, targetLang) {
 					// console.log(element);
 					sTranslated += element[0];
 				});
-				$('.right-text').text(sTranslated);
+				// console.log(sTranslated, isLeft);
+				if (isLeft == undefined) {
+					$('.right-text').val(sTranslated);
+				} else {
+					$('.left-text').val(sTranslated);
+				}
 			} else {
 				console.error('Failed to translate text.');
-				showToast({ content: 'Please enter text or talk to translate', type: 'bad' });
+				showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> and talk', type: 'bad' });
 			}
 		},
 		error: function (xhr, status, error) {
@@ -189,7 +200,7 @@ function showNotification(title, body, redirectUrl) {
 		showToast({ content: 'This browser does not support desktop notification', type: 'bad' });
 		return;
 	}
-	
+
 	var options = {
 		body: body,
 		icon: '/assets/icons/toll-calc-b.png'
@@ -211,7 +222,7 @@ function showNotification(title, body, redirectUrl) {
 		Notification.requestPermission().then(function (permission) {
 			if (permission === "granted") {
 				var notification = new Notification(title, options);
-	
+
 				notification.onclick = function (event) {
 					event.preventDefault(); // Prevent the browser from focusing the Notification's tab
 					window.open(redirectUrl, '_blank');
@@ -243,7 +254,7 @@ var requestPermission = function (origin_data, dest_data) {
 	Notification.requestPermission().then(permFn);
 }
 
-var runRecordText = function() {
+var runRecordText = function () {
 	const startRecordBtn = $('.start-record-btn');
 	const startSpeakBtn = $('.start-speak-btn');
 	const capturedTextDiv = $('.left-text');
@@ -265,7 +276,7 @@ var runRecordText = function() {
 
 	recognition.onstart = function () {
 		startRecordBtn.attr('data-recording', 1);
-		$('.right-text').text('Listening...');
+		$('.right-text').val('Translating...');
 	};
 
 	recognition.onresult = function (event) {
@@ -274,18 +285,18 @@ var runRecordText = function() {
 		recognizedText += event.results[0][0].transcript;
 		console.log(recognizedText);
 	};
-	
+
 	recognition.onerror = function (event) {
 		console.error(event.error);
 		recognition.stop();
 		showToast({ content: 'Error occurred in recognition: ' + event.error, type: 'bad' });
 	};
-	
+
 	recognition.onend = function () {
-		startSpeakBtn.css({ 'pointer-events':'' });
+		startSpeakBtn.css({ 'pointer-events': '' });
 		startRecordBtn.removeAttr('data-recording');
 		capturedTextDiv.val(recognizedText);
-		$('.right-text').text('');
+		$('.right-text').val('');
 		testTranslator();
 	};
 
@@ -307,11 +318,12 @@ var runRecordText = function() {
 }
 
 var testTranslator = function () {
-	var sl = $(".dialect[data-index=left]").attr('data-dialect');
-	sl = (sl == undefined) ? $('#recent-languages-left').find('button.active').attr('data-dialect') : sl;
-	var tl = $(".dialect[data-index=right]").attr('data-dialect');
-	tl = (tl == undefined) ? $('#recent-languages-right').find('button.active').attr('data-dialect') : tl;
+	var sl = $('#recent-languages-left').find('button.active').attr('data-dialect');
+	sl = (sl == undefined) ? $(".dialect[data-index=left]").attr('data-dialect') : sl;
+	var tl = $('#recent-languages-right').find('button.active').attr('data-dialect');
+	tl = (tl == undefined) ? $(".dialect[data-index=right]").attr('data-dialect') : tl;
 
+	console.log(sl, tl);
 	if (sl != undefined && tl != undefined) {
 		translateText($('.left-text').val(), sl, tl);
 	} else {
@@ -334,13 +346,13 @@ var recordVoice = function (e) {
 		let chunks = [];
 
 		navigator.mediaDevices
-		.getUserMedia(constraints)
-		.then((stream) => {
-			const mediaRecorder = new MediaRecorder(stream);
-			speakNow(mediaRecorder, chunks);
-		}).catch((err) => {
-			console.error(`The following error occurred: ${err}`);
-		});
+			.getUserMedia(constraints)
+			.then((stream) => {
+				const mediaRecorder = new MediaRecorder(stream);
+				speakNow(mediaRecorder, chunks);
+			}).catch((err) => {
+				console.error(`The following error occurred: ${err}`);
+			});
 	}
 }
 
@@ -352,86 +364,86 @@ var recordVoiceV1 = function (record, stop) {
 		let chunks = [];
 
 		navigator.mediaDevices
-		.getUserMedia(constraints)
-		.then((stream) => {
-			const mediaRecorder = new MediaRecorder(stream);
+			.getUserMedia(constraints)
+			.then((stream) => {
+				const mediaRecorder = new MediaRecorder(stream);
 
-			record.onclick = () => {
-				if (record.dataset.recording != true) {
-					mediaRecorder.start();
-					console.log(mediaRecorder.state);
-					console.log("recorder started");
-					record.style.background = "red !important";
-					// record.style.color = "black";
-					record.dataset.recording = true;
-				} else {
+				record.onclick = () => {
+					if (record.dataset.recording != true) {
+						mediaRecorder.start();
+						console.log(mediaRecorder.state);
+						console.log("recorder started");
+						record.style.background = "red !important";
+						// record.style.color = "black";
+						record.dataset.recording = true;
+					} else {
+						mediaRecorder.stop();
+						console.log(mediaRecorder.state);
+						console.log("recorder stopped");
+						record.style.background = "";
+					}
+				};
+
+				/* stop.onclick = () => {
 					mediaRecorder.stop();
 					console.log(mediaRecorder.state);
 					console.log("recorder stopped");
 					record.style.background = "";
-				}
-			};
+					record.style.color = "";
+				}; */
 
-			/* stop.onclick = () => {
-				mediaRecorder.stop();
-				console.log(mediaRecorder.state);
-				console.log("recorder stopped");
-				record.style.background = "";
-				record.style.color = "";
-			}; */
+				mediaRecorder.onstop = (e) => {
+					console.log("data available after MediaRecorder.stop() called.");
 
-			mediaRecorder.onstop = (e) => {
-				console.log("data available after MediaRecorder.stop() called.");
+					const clipName = prompt("Enter a name for your sound clip");
 
-				const clipName = prompt("Enter a name for your sound clip");
+					const clipContainer = document.createElement("article");
+					const clipLabel = document.createElement("p");
+					const audio = document.createElement("audio");
+					const deleteButton = document.createElement("button");
+					const mainContainer = document.querySelector("body");
 
-				const clipContainer = document.createElement("article");
-				const clipLabel = document.createElement("p");
-				const audio = document.createElement("audio");
-				const deleteButton = document.createElement("button");
-				const mainContainer = document.querySelector("body");
+					clipContainer.classList.add("clip");
+					audio.setAttribute("controls", "");
+					deleteButton.textContent = "Delete";
+					clipLabel.textContent = clipName;
 
-				clipContainer.classList.add("clip");
-				audio.setAttribute("controls", "");
-				deleteButton.textContent = "Delete";
-				clipLabel.textContent = clipName;
+					clipContainer.appendChild(audio);
+					clipContainer.appendChild(clipLabel);
+					clipContainer.appendChild(deleteButton);
+					mainContainer.appendChild(clipContainer);
 
-				clipContainer.appendChild(audio);
-				clipContainer.appendChild(clipLabel);
-				clipContainer.appendChild(deleteButton);
-				mainContainer.appendChild(clipContainer);
+					audio.controls = true;
+					const blob = new Blob(chunks, { type: "audio/mp3; codecs=opus" });
+					chunks = [];
+					const audioURL = URL.createObjectURL(blob);
+					audio.src = audioURL;
+					console.log("recorder stopped");
 
-				audio.controls = true;
-				const blob = new Blob(chunks, { type: "audio/mp3; codecs=opus" });
-				chunks = [];
-				const audioURL = URL.createObjectURL(blob);
-				audio.src = audioURL;
-				console.log("recorder stopped");
+					/* const a = document.createElement("a");
+					a.href = audioURL;
+					a.download = "myAudio.mp3";
+					document.body.appendChild(a);
+				
+					console.log(a);
+				
+					a.click();
+					URL.revokeObjectURL(audioURL);
+					a.remove(); */
 
-				/* const a = document.createElement("a");
-				a.href = audioURL;
-				a.download = "myAudio.mp3";
-				document.body.appendChild(a);
-			
-				console.log(a);
-			
-				a.click();
-				URL.revokeObjectURL(audioURL);
-				a.remove(); */
-
-				deleteButton.onclick = (e) => {
-					const evtTgt = e.target;
-					evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
+					deleteButton.onclick = (e) => {
+						const evtTgt = e.target;
+						evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
+					};
 				};
-			};
 
-			mediaRecorder.ondataavailable = (e) => {
-				chunks.push(e.data);
-			};
-		})
-		.catch((err) => {
-			console.error(`The following error occurred: ${err}`);
-		});
+				mediaRecorder.ondataavailable = (e) => {
+					chunks.push(e.data);
+				};
+			})
+			.catch((err) => {
+				console.error(`The following error occurred: ${err}`);
+			});
 	}
 }
 
@@ -477,7 +489,7 @@ var recordVoiceWaves = function () {
 			ctx.stroke();
 		}
 	}
-	
+
 	document.body.appendChild(input);
 	document.body.appendChild(canvas);
 
@@ -528,7 +540,7 @@ var speakNow = function (e) {
 	if (isSpeaking == false) {
 		var isRight = true;
 		if ($(e.target).parents('[id*=action-panel-]').attr('id') == 'action-panel-right') {
-			var text = $('.right-text').text();
+			var text = $('.right-text').val();
 			var sLanguage = $(".dialect[data-index=right]").attr('data-dialect');
 			sLanguage = (sLanguage == undefined) ? $('#recent-languages-right').find('button.active').attr('data-dialect') : sLanguage;
 		} else if ($(e.target).parents('[id*=action-panel-]').attr('id') == 'action-panel-left') {
@@ -542,7 +554,7 @@ var speakNow = function (e) {
 			if (sLanguage == undefined) {
 				showToast({ content: 'Please select a language ' + (isRight ? 'target' : 'source'), type: 'bad' });
 			} else {
-				showToast({ content: 'Please enter text or talk to translate', type: 'bad' });
+				showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> and talk', type: 'bad' });
 			}
 			return;
 		}
@@ -562,7 +574,7 @@ var speakNow = function (e) {
 	} else {
 		window.speechSynthesis.cancel();
 		isSpeaking = false;
-		showToast({ content: 'Speaker Stopped', type: 'info' });
+		showToast({ content: 'Speaker stopped!', type: 'info' });
 	}
 }
 
@@ -603,9 +615,9 @@ function speakNextChunk(sLanguage) {
 var speakNowV2 = function (recorder, chunks) {
 	// console.log(isSpeaking);
 	if (isSpeaking == false) {
-		var text = $('.right-text').text();
+		var text = $('.right-text').val();
 		if (text.trim() === '') {
-			showToast({ content: 'Please enter text or talk to translate', type: 'bad' });
+			showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> and talk', type: 'bad' });
 			return;
 		}
 		// Cancel any ongoing speech synthesis
@@ -625,7 +637,7 @@ var speakNowV2 = function (recorder, chunks) {
 	} else {
 		window.speechSynthesis.cancel();
 		isSpeaking = false;
-		showToast({ content: 'Speaker Stopped', type: 'info' });
+		showToast({ content: 'Speaker stopped!', type: 'info' });
 	}
 }
 

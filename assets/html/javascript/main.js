@@ -13,26 +13,36 @@ $(document).ready(function () {
 					$(this).attr('data-dialect', ui.item.code);
 					if ($(this).attr('data-index') == 'left') {
 						var direction = 'left';
-						$('.left-text').val('');
-						$('.left-text').attr('disabled', 'disabled');
-						$('.left-text').removeAttr('disabled');
+						var currentActive = $(this).parents('[id*=recent-languages-]').find('button.active:not(.first-buts)');
+						var sl = currentActive.attr('data-dialect');
+						var tl = $(this).attr('data-dialect');
+						translateText($('.left-text').val(), sl, tl, true);
+						testTranslator();
 					} else {
 						var direction = 'right';
-						var sl = $(".dialect[data-index=left]").attr('data-dialect');
-						sl = (sl == undefined) ? $('#recent-languages-left').find('button.active').attr('data-dialect') : sl;
-						console.log(sl);
+						var sl = $('#recent-languages-left').find('button.active').attr('data-dialect');
+						sl = (sl == undefined) ? $(".dialect[data-index=left]").attr('data-dialect') : sl;
+						console.log($('.left-text').val(), sl, ui.item.code);
 						translateText($('.left-text').val(), sl, ui.item.code);
 					}
 					runRecentLanguagesActive(direction, ui.item);
 
 					$('.added-btn').off('click').on('click', function (e) {
-						$(this).parents('[id*=recent-languages-]').find('button:not(.first-buts)').removeClass('active');
-						$(this).addClass('active');
-						var sDirection = $(this).parents('[id*=recent-languages-]').attr('id');
-						if (sDirection == 'recent-languages-right') {
-							// console.log(sDirection);
-							testTranslator();
-						}
+						var currentActive = $(this).parents('[id*=recent-languages-]').find('button.active:not(.first-buts)');
+
+						setTimeout(() => {
+							$(this).parents('[id*=recent-languages-]').find('button:not(.first-buts)').removeClass('active');
+							$(this).addClass('active');
+							var sDirection = $(this).parents('[id*=recent-languages-]').attr('id');
+							if (sDirection == 'recent-languages-right') {
+								// console.log(sDirection);
+								testTranslator();
+							} else {
+								var sl = currentActive.attr('data-dialect');
+								var tl = $(this).attr('data-dialect');
+								translateText($('.left-text').val(), sl, tl, true);
+							}
+						}, 33);
 					});
 				},
 				close: function (event, ui) {
@@ -41,7 +51,6 @@ $(document).ready(function () {
 					} else {
 						var buttonAll = $('#recent-languages-right').find('button:not(.first-buts)');
 					}
-
 					if (buttonAll.length <= 4) {
 						$(this).val('');
 					}
@@ -60,6 +69,9 @@ $(document).ready(function () {
 				$('textarea').css('height', height + 30 + 'px');
 			}
 		}
+		if ($(this).val().trim().length == 0) {
+			$(this).prev('.clear-text-btn').hide();
+		}
 	}).on('keydown', function (e) {
 		if (mobileCheck() == false) {
 			if (e.keyCode == 8 || e.keyCode == 46) {
@@ -69,14 +81,44 @@ $(document).ready(function () {
 				} else if (this.clientHeight < actualClientHeight) {
 					$('textarea').css('height', actualClientHeight + 'px');
 				}
-	
-				if ($(this).val().length == 0) {
-					$(this).prev('.clear-text-btn').hide();
-				}
 			}
+		}
+		if ($(this).val().trim().length == 0) {
+			$(this).prev('.clear-text-btn').hide();
+		}
+	}).on('paste', function (e) {
+		if (mobileCheck() == false) {
+			var height = parseInt($(this).css('height'));
+			$('textarea').css('height', height + 30 + 'px');
+		}
+		if ($(this).val().trim().length == 0) {
+			$(this).prev('.clear-text-btn').hide();
+		}
+	}).on('cut', function (e) {
+		if (mobileCheck() == false) {
+			if (this.clientHeight > actualClientHeight) {
+				var height = parseInt($(this).css('height'));
+				$('textarea').css('height', height - 30 + 'px');
+			} else {
+				$('textarea').css('height', actualClientHeight + 'px');
+			}
+		}
+		if ($(this).val().trim().length == 0) {
+			$(this).prev('.clear-text-btn').hide();
 		}
 	}).on('input', function (e) {
 		$(this).prev('.clear-text-btn').show();
+		var tl = $('#recent-languages-right').find('button.active').attr('data-dialect');
+		tl = (tl == undefined) ? $(".dialect[data-index=right]").attr('data-dialect') : tl;
+		// console.log($(this).val());
+		if ($(this).val().trim().length) {
+			if (tl != undefined) {
+				testTranslator();
+			}
+		} else {
+			$('textarea').val('');
+			$(this).prev('.clear-text-btn').hide();
+		}
 	});
 	
 	$('.clear-text-btn').on('click', function (e) {
