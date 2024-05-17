@@ -572,6 +572,7 @@ var speakNow = function (e) {
 			}
 		}
 	} else {
+		$(e.target).attr('class', 'fa fa-volume-up').css('color', '');
 		window.speechSynthesis.cancel();
 		showToast({ content: 'Speaker stopped.', type: 'info' });
 	}
