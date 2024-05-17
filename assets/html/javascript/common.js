@@ -111,7 +111,7 @@ var translateText = function (text, sourceLang, targetLang, isLeft) {
 				}
 			} else {
 				console.error('Failed to translate text.');
-				showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> and talk', type: 'bad' });
+				showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> microphone to talk', type: 'bad' });
 			}
 		},
 		error: function (xhr, status, error) {
@@ -554,7 +554,7 @@ var speakNow = function (e) {
 			if (sLanguage == undefined) {
 				showToast({ content: 'Please select a language ' + (isRight ? 'target' : 'source'), type: 'bad' });
 			} else {
-				showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> and talk', type: 'bad' });
+				showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> microphone to talk', type: 'bad' });
 			}
 			return;
 		}
@@ -617,7 +617,7 @@ var speakNowV2 = function (recorder, chunks) {
 	if (isSpeaking == false) {
 		var text = $('.right-text').val();
 		if (text.trim() === '') {
-			showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> and talk', type: 'bad' });
+			showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> microphone to talk', type: 'bad' });
 			return;
 		}
 		// Cancel any ongoing speech synthesis
