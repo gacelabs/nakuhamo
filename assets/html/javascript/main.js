@@ -39,8 +39,10 @@ $(document).ready(function () {
 							var sDirection = $(this).parents('[id*=recent-languages-]').attr('id');
 							if (sDirection == 'recent-languages-right') {
 								// console.log(sDirection);
+								$('.dialect[data-index="right"]').val('').removeAttr('data-dialect');
 								testTranslator();
 							} else {
+								$('.dialect[data-index="left"]').val('').removeAttr('data-dialect');
 								var sl = currentActive.attr('data-dialect');
 								var tl = $(this).attr('data-dialect');
 								translateText($('.left-text').val(), sl, tl, true);
@@ -55,7 +57,7 @@ $(document).ready(function () {
 						} else {
 							var buttonAll = $('#recent-languages-right').find('button:not(.first-buts)');
 						}
-						if (buttonAll.length != 4) {
+						if (buttonAll.length < 4) {
 							$(this).val('');
 						}
 					}
