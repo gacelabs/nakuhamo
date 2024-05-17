@@ -25,7 +25,10 @@ $(document).ready(function () {
 						// console.log($('.left-text').val(), sl, ui.item.code);
 						translateText($('.left-text').val(), sl, ui.item.code);
 					}
-					runRecentLanguagesActive(direction, ui.item);
+
+					if (mobileCheck() == false) {
+						runRecentLanguagesActive(direction, ui.item);
+					}
 
 					$('.added-btn').off('click').on('click', function (e) {
 						var currentActive = $(this).parents('[id*=recent-languages-]').find('button.active:not(.first-buts)');
@@ -46,13 +49,15 @@ $(document).ready(function () {
 					});
 				},
 				close: function (event, ui) {
-					if ($(this).attr('data-index') == 'left') {
-						var buttonAll = $('#recent-languages-left').find('button:not(.first-buts)');
-					} else {
-						var buttonAll = $('#recent-languages-right').find('button:not(.first-buts)');
-					}
-					if (buttonAll.length <= 4) {
-						$(this).val('');
+					if (mobileCheck() == false) {
+						if ($(this).attr('data-index') == 'left') {
+							var buttonAll = $('#recent-languages-left').find('button:not(.first-buts)');
+						} else {
+							var buttonAll = $('#recent-languages-right').find('button:not(.first-buts)');
+						}
+						if (buttonAll.length <= 4) {
+							$(this).val('');
+						}
 					}
 				}
 			}).focus(function () {
