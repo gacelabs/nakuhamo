@@ -597,13 +597,17 @@ function splitTextIntoChunks(text, maxLength) {
 	return chunks;
 }
 
-var jsVoices = window.speechSynthesis.getVoices();
-var oVoices = new JSONQuery(jsVoices);
+var jsVoices = [];
+var oVoices = false;
 function speakNextChunk(sLanguage, e) {
 	window.speechSynthesis.cancel();
 	var chunk = speechQueue.shift();
 
 	if (chunk != undefined) {
+		if (jsVoices.length == 0) {
+			jsVoices = window.speechSynthesis.getVoices();
+		}
+		oVoices = new JSONQuery(jsVoices);
 		var utterance = new SpeechSynthesisUtterance(chunk);
 		utterance.lang = sLanguage; // Set the language
 		var oVoice = oVoices.execute({
@@ -615,13 +619,14 @@ function speakNextChunk(sLanguage, e) {
 			}
 		});
 		if (oVoice.data.length) {
-			var random = Math.floor(Math.random() * oVoice.data.length);
-			var sVoice = oVoice.data[random];
+			// var random = Math.floor(Math.random() * oVoice.data.length);
+			// var sVoice = oVoice.data[random];
+			var sVoice = oVoice.data[0];
 		} else {
 			var sVoice = jsVoices[0];
 		}
 		utterance.voice = sVoice;
-		// console.log(speechQueue.length, sLanguage, chunk, window.speechSynthesis);
+		// console.log(oVoice, sLanguage, sVoice);
 		utterance.onend = function () {
 			return speakNextChunk(sLanguage, e);
 		};
