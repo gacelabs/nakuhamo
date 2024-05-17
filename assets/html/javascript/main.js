@@ -22,7 +22,7 @@ $(document).ready(function () {
 						var direction = 'right';
 						var sl = $('#recent-languages-left').find('button.active').attr('data-dialect');
 						sl = (sl == undefined) ? $(".dialect[data-index=left]").attr('data-dialect') : sl;
-						console.log($('.left-text').val(), sl, ui.item.code);
+						// console.log($('.left-text').val(), sl, ui.item.code);
 						translateText($('.left-text').val(), sl, ui.item.code);
 					}
 					runRecentLanguagesActive(direction, ui.item);

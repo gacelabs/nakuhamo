@@ -111,7 +111,7 @@ var translateText = function (text, sourceLang, targetLang, isLeft) {
 				}
 			} else {
 				console.error('Failed to translate text.');
-				showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> microphone to talk', type: 'bad' });
+				showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> microphone to talk.', type: 'bad' });
 			}
 		},
 		error: function (xhr, status, error) {
@@ -197,7 +197,7 @@ function showToast(params) {
 function showNotification(title, body, redirectUrl) {
 	if (("Notification" in window) == false) {
 		console.error("This browser does not support desktop notification");
-		showToast({ content: 'This browser does not support desktop notification', type: 'bad' });
+		showToast({ content: 'This browser does not support desktop notification.', type: 'bad' });
 		return;
 	}
 
@@ -231,7 +231,7 @@ function showNotification(title, body, redirectUrl) {
 			}
 		});
 	} else {
-		showToast({ content: 'Cannot accept Notifications, site must be secured and on HTTPS protocol!', type: 'bad' });
+		showToast({ content: 'Cannot accept Notifications, site must be secured and on HTTPS protocol.', type: 'bad' });
 	}
 }
 
@@ -280,19 +280,18 @@ var runRecordText = function () {
 	};
 
 	recognition.onresult = function (event) {
-		startRecordBtn.css({ 'color': '' });
-		startSpeakBtn.css({ 'color': '' });
 		recognizedText += event.results[0][0].transcript;
 		console.log(recognizedText);
 	};
-
+	
 	recognition.onerror = function (event) {
 		console.error(event.error);
 		recognition.stop();
 		showToast({ content: 'Error occurred in recognition: ' + event.error, type: 'bad' });
 	};
-
+	
 	recognition.onend = function () {
+		startRecordBtn.css({ 'color': '' });
 		startSpeakBtn.css({ 'pointer-events': '' });
 		startRecordBtn.removeAttr('data-recording');
 		capturedTextDiv.val(recognizedText);
@@ -301,8 +300,8 @@ var runRecordText = function () {
 	};
 
 	startRecordBtn.click(function () {
+		startRecordBtn.css({ 'color': 'red' });
 		if (startRecordBtn.attr('data-recording') != 1) {
-			startRecordBtn.css({ 'color': 'red' });
 			startSpeakBtn.css({ 'pointer-events': 'none', 'color': 'gray' });
 			recognition.start();
 			console.log("recorder started");
@@ -323,17 +322,17 @@ var testTranslator = function () {
 	var tl = $('#recent-languages-right').find('button.active').attr('data-dialect');
 	tl = (tl == undefined) ? $(".dialect[data-index=right]").attr('data-dialect') : tl;
 
-	console.log(sl, tl);
+	// console.log(sl, tl);
 	if (sl != undefined && tl != undefined) {
 		translateText($('.left-text').val(), sl, tl);
 	} else {
 		if (sl == undefined && tl == undefined) {
-			showToast({ content: 'Please select a languages to complete translation', type: 'bad' });
+			showToast({ content: 'Please select a languages to complete translation.', type: 'bad' });
 		} else {
 			if (sl == undefined && tl != undefined) {
-				showToast({ content: 'Please select a language source', type: 'bad' });
+				showToast({ content: 'Please select a language source.', type: 'bad' });
 			} else if (sl != undefined && tl == undefined) {
-				showToast({ content: 'Please select a language target', type: 'bad' });
+				showToast({ content: 'Please select a language target.', type: 'bad' });
 			}
 		}
 	}
@@ -533,83 +532,77 @@ function runVoiceRecorder(recorder, chunks) {
 
 var speechQueue = [];
 var isSpeaking = false;
-var MAX_CHUNK_LENGTH = 200;
+var MAX_CHUNK_LENGTH = 100;
 
 var speakNow = function (e) {
-	// console.log(isSpeaking);
-	if (isSpeaking == false) {
-		var isRight = true;
-		if ($(e.target).parents('[id*=action-panel-]').attr('id') == 'action-panel-right') {
-			var text = $('.right-text').val();
-			var sLanguage = $(".dialect[data-index=right]").attr('data-dialect');
-			sLanguage = (sLanguage == undefined) ? $('#recent-languages-right').find('button.active').attr('data-dialect') : sLanguage;
-		} else if ($(e.target).parents('[id*=action-panel-]').attr('id') == 'action-panel-left') {
-			isRight = false;
-			var text = $('.left-text').val();
-			var sLanguage = $(".dialect[data-index=left]").attr('data-dialect');
-			sLanguage = (sLanguage == undefined) ? $('#recent-languages-left').find('button.active').attr('data-dialect') : sLanguage;
-		}
+	// console.log(window.speechSynthesis.speaking);
+	var isRight = true;
+	if ($(e.target).parents('[id*=action-panel-]').attr('id') == 'action-panel-right') {
+		var text = $('.right-text').val();
+		var sLanguage = $('#recent-languages-right').find('button.active').attr('data-dialect');
+		sLanguage = (sLanguage == undefined) ? $(".dialect[data-index=right]").attr('data-dialect') : sLanguage;
+	} else if ($(e.target).parents('[id*=action-panel-]').attr('id') == 'action-panel-left') {
+		isRight = false;
+		var text = $('.left-text').val();
+		var sLanguage = $('#recent-languages-left').find('button.active').attr('data-dialect');
+		sLanguage = (sLanguage == undefined) ? $(".dialect[data-index=left]").attr('data-dialect') : sLanguage;
+	}
+
+	if (window.speechSynthesis.speaking == false) {
 		// console.log(sLanguage);
-		if (text.trim() === '') {
+		if (text.trim().length == 0) {
 			if (sLanguage == undefined) {
 				showToast({ content: 'Please select a language ' + (isRight ? 'target' : 'source'), type: 'bad' });
 			} else {
-				showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> microphone to talk', type: 'bad' });
+				showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> microphone to talk.', type: 'bad' });
 			}
-			return;
-		}
-		// Cancel any ongoing speech synthesis
-		window.speechSynthesis.cancel();
-
-		try {
-			if (speechQueue.length == 0) {
+		} else {
+			// Cancel any ongoing speech synthesis
+			window.speechSynthesis.cancel();
+			try {
 				speechQueue = splitTextIntoChunks(text, MAX_CHUNK_LENGTH);
-			} else {
-				isSpeaking = false;
+				speakNextChunk(sLanguage);
+			} catch (error) {
+				showToast({ content: error, type: 'bad' });
 			}
-			speakNextChunk(sLanguage);
-		} catch (error) {
-			showToast({ content: error, type: 'bad' });
 		}
 	} else {
 		window.speechSynthesis.cancel();
-		isSpeaking = false;
-		showToast({ content: 'Speaker stopped!', type: 'info' });
+		showToast({ content: 'Speaker stopped.', type: 'info' });
 	}
 }
 
 function splitTextIntoChunks(text, maxLength) {
-	var chunks = [];
-	var start = 0;
-	while (start < text.length) {
-		var end = Math.min(start + maxLength, text.length);
-		if (end < text.length) {
-			while (end > start && !/\s/.test(text[end])) {
-				end--;
+	var chunks = text.match(/[^.!?。]+[.!?。]+/g) || [];
+	if (chunks.length == 0) {
+		var start = 0;
+		while (start < text.length) {
+			var end = Math.min(start + maxLength, text.length);
+			if (end < text.length) {
+				while (end > start && !/\s/.test(text[end])) {
+					end--;
+				}
 			}
+			chunks.push(text.slice(start, end).trim());
+			start = end;
 		}
-		chunks.push(text.slice(start, end).trim());
-		start = end;
 	}
 	return chunks;
 }
 
 function speakNextChunk(sLanguage) {
-	if (speechQueue.length === 0 || isSpeaking) {
-		isSpeaking = false;
-		return;
-	}
-
-	isSpeaking = true;
+	window.speechSynthesis.cancel();
 	var chunk = speechQueue.shift();
-	var utterance = new SpeechSynthesisUtterance(chunk);
-	utterance.lang = sLanguage; // Set the language
-	utterance.onend = function () {
-		// console.log(speechQueue, isSpeaking);
-		isSpeaking = false;
-		return speakNextChunk();
-	};
-	window.speechSynthesis.speak(utterance);
+
+	if (chunk != undefined) {
+		var utterance = new SpeechSynthesisUtterance(chunk);
+		utterance.lang = sLanguage; // Set the language
+		// console.log(speechQueue.length, sLanguage, chunk, window.speechSynthesis);
+		utterance.onend = function () {
+			return speakNextChunk(sLanguage);
+		};
+		window.speechSynthesis.speak(utterance);
+	}
 }
 
 var speakNowV2 = function (recorder, chunks) {
@@ -617,7 +610,7 @@ var speakNowV2 = function (recorder, chunks) {
 	if (isSpeaking == false) {
 		var text = $('.right-text').val();
 		if (text.trim() === '') {
-			showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> microphone to talk', type: 'bad' });
+			showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> microphone to talk.', type: 'bad' });
 			return;
 		}
 		// Cancel any ongoing speech synthesis
@@ -637,7 +630,7 @@ var speakNowV2 = function (recorder, chunks) {
 	} else {
 		window.speechSynthesis.cancel();
 		isSpeaking = false;
-		showToast({ content: 'Speaker stopped!', type: 'info' });
+		showToast({ content: 'Speaker stopped.', type: 'info' });
 	}
 }
 
