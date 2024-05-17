@@ -83,10 +83,10 @@ a:hover.start-speak-btn, a:hover.start-record-btn, a:hover.start-share-btn {
 }
 .start-speak-btn, .start-record-btn, .start-share-btn {
 	z-index: 1;
-	position: relative;
+	position: absolute;
 	padding: 0px 10px;
 	font-size: 25px;
-	bottom: 45px;
+	bottom: 0;
 	right: 0px;
 	color: #212529;
 }
@@ -115,4 +115,30 @@ textarea {
 
 .hide {
 	display: none !important;
+}
+
+.left-text, .right-text {
+	border-bottom: none !important;
+	overflow: auto;
+	outline: none;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+	resize: none;
+}
+
+#action-panel-left, #action-panel-right {
+	top: -7px;
+	position: relative;
+	border: 1px solid #ccc;
+	height: 50px;
+	border-top: none;
+}
+
+#action-panel-right {
+	background-color: #fafafa;
+}
+
+.start-record-btn {
+	right: 45px;
 }

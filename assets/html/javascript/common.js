@@ -41,6 +41,7 @@ var detectLanguage = function () {
 					var buttonFirst = $('#recent-languages-left').find('button.first-buts');
 					var buttonFirstClone = buttonFirst.clone(true).text('Detecting language...').removeClass('hide first-buts').insertAfter(buttonFirst);
 					$('.left-text').attr('disabled', 'disabled');
+					$('#action-panel-left').css({ 'background-color' : '#fafafa;' });
 
 					setTimeout(() => {
 						$.ajax({
@@ -61,6 +62,7 @@ var detectLanguage = function () {
 									}
 								}
 								$('.left-text').removeAttr('disabled');
+								$('#action-panel-left').css({ 'background-color': '#fff;' });
 							}
 						});
 					}, 1000);
@@ -110,8 +112,9 @@ var translateText = function (text, sourceLang, targetLang, isLeft) {
 					$('.left-text').val(sTranslated);
 				}
 			} else {
-				console.error('Failed to translate text.');
-				showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> microphone to talk.', type: 'bad' });
+				console.error('Failed to translate text.', response);
+				var isMobile = mobileCheck();
+				showToast({ content: 'Please enter text or ' + (isMobile ? 'tap' : 'click') + ' microphone to talk.', type: 'bad' });
 			}
 		},
 		error: function (xhr, status, error) {
@@ -554,14 +557,16 @@ var speakNow = function (e) {
 			if (sLanguage == undefined) {
 				showToast({ content: 'Please select a language ' + (isRight ? 'target' : 'source'), type: 'bad' });
 			} else {
-				showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> microphone to talk.', type: 'bad' });
+				var isMobile = mobileCheck();
+				showToast({ content: 'Please enter text or ' + (isMobile ? 'tap' : 'click') + ' microphone to talk.', type: 'bad' });
 			}
 		} else {
 			// Cancel any ongoing speech synthesis
 			window.speechSynthesis.cancel();
 			try {
+				$(e.target).attr('class', 'fa fa-stop').css('color', 'red');
 				speechQueue = splitTextIntoChunks(text, MAX_CHUNK_LENGTH);
-				speakNextChunk(sLanguage);
+				speakNextChunk(sLanguage, e);
 			} catch (error) {
 				showToast({ content: error, type: 'bad' });
 			}
@@ -590,7 +595,7 @@ function splitTextIntoChunks(text, maxLength) {
 	return chunks;
 }
 
-function speakNextChunk(sLanguage) {
+function speakNextChunk(sLanguage, e) {
 	window.speechSynthesis.cancel();
 	var chunk = speechQueue.shift();
 
@@ -599,9 +604,11 @@ function speakNextChunk(sLanguage) {
 		utterance.lang = sLanguage; // Set the language
 		// console.log(speechQueue.length, sLanguage, chunk, window.speechSynthesis);
 		utterance.onend = function () {
-			return speakNextChunk(sLanguage);
+			return speakNextChunk(sLanguage, e);
 		};
 		window.speechSynthesis.speak(utterance);
+	} else {
+		$(e.target).attr('class', 'fa fa-volume-up').css('color', '');
 	}
 }
 
@@ -610,7 +617,8 @@ var speakNowV2 = function (recorder, chunks) {
 	if (isSpeaking == false) {
 		var text = $('.right-text').val();
 		if (text.trim() === '') {
-			showToast({ content: 'Please enter text or tap <i class="fa fa-microphone"></i> microphone to talk.', type: 'bad' });
+			var isMobile = mobileCheck();
+			showToast({ content: 'Please enter text or ' + (isMobile ? 'tap' : 'click') + ' microphone to talk.', type: 'bad' });
 			return;
 		}
 		// Cancel any ongoing speech synthesis

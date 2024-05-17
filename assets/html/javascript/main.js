@@ -66,7 +66,7 @@ $(document).ready(function () {
 		}
 	});
 	
-	var actualClientHeight = $('textarea:first').get(0).clientHeight
+	var actualClientHeight = $('textarea:first').get(0).clientHeight;
 	$('textarea').on('keypress', function (e) {
 		if (mobileCheck() == false) {
 			if (e.keyCode == 13 || this.clientHeight < this.scrollHeight) {
