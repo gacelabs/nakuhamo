@@ -33,6 +33,15 @@ html, body, h1, h2, h3, h4, h5, h6 {
 	}
 }
 
+@media only screen and (min-width: 376px) and (max-width: 424px) and (orientation : portrait) {
+	.dialect {
+		width: 150px !important;
+	}
+	textarea {
+		overflow-y: scroll;
+	}
+}
+
 @media only screen and (width: 375px) {
 	.dialect {
 		width: 150px !important;
@@ -42,7 +51,25 @@ html, body, h1, h2, h3, h4, h5, h6 {
 	}
 }
 
+@media only screen and (min-width: 321px) and (max-width: 374px) and (orientation : portrait) {
+	.dialect {
+		width: 150px !important;
+	}
+	textarea {
+		overflow-y: scroll;
+	}
+}
+
 @media only screen and (width: 320px) {
+	.dialect {
+		width: 120px !important;
+	}
+	textarea {
+		overflow-y: scroll;
+	}
+}
+
+@media only screen and (max-width: 319px) and (orientation : portrait) {
 	.dialect {
 		width: 120px !important;
 	}
