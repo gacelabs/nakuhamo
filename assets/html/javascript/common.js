@@ -564,7 +564,7 @@ var speakNow = function (e) {
 			// Cancel any ongoing speech synthesis
 			window.speechSynthesis.cancel();
 			try {
-				$(e.target).attr('class', 'fa fa-stop').css('color', 'red');
+				$(e.target).removeAttr('class').attr('class', 'fa fa-stop').css('color', 'red');
 				speechQueue = splitTextIntoChunks(text, MAX_CHUNK_LENGTH);
 				speakNextChunk(sLanguage, e);
 			} catch (error) {
@@ -572,7 +572,8 @@ var speakNow = function (e) {
 			}
 		}
 	} else {
-		$(e.target).attr('class', 'fa fa-volume-up').css('color', '');
+		window.speechSynthesis.speaking = false;
+		$(e.target).removeAttr('class').attr('class', 'fa fa-volume-up').css('color', '');
 		window.speechSynthesis.cancel();
 		showToast({ content: 'Speaker stopped.', type: 'info' });
 	}
@@ -609,7 +610,7 @@ function speakNextChunk(sLanguage, e) {
 		};
 		window.speechSynthesis.speak(utterance);
 	} else {
-		$(e.target).attr('class', 'fa fa-volume-up').css('color', '');
+		$(e.target).removeAttr('class').attr('class', 'fa fa-volume-up').css('color', '');
 	}
 }
 
