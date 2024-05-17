@@ -26,7 +26,7 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 @media only screen and (width: 425px) {
 	.dialect {
-		width: 183.5px !important;
+		width: 175px !important;
 	}
 	textarea {
 		overflow-y: scroll;
@@ -35,7 +35,7 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 @media only screen and (width: 375px) {
 	.dialect {
-		width: 158.5px !important;
+		width: 150px !important;
 	}
 	textarea {
 		overflow-y: scroll;
@@ -44,7 +44,7 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 @media only screen and (width: 320px) {
 	.dialect {
-		width: 130.5px !important;
+		width: 120px !important;
 	}
 	textarea {
 		overflow-y: scroll;
