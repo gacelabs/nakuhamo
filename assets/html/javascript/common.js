@@ -295,7 +295,7 @@ var runRecordText = function () {
 	
 	recognition.onend = function () {
 		startRecordBtn.css({ 'color': '' });
-		startSpeakBtn.css({ 'pointer-events': '' });
+		startSpeakBtn.css({ 'pointer-events': '', 'color': '' });
 		startRecordBtn.removeAttr('data-recording');
 		capturedTextDiv.val(recognizedText);
 		$('.right-text').val('');
