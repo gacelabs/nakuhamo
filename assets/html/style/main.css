@@ -142,3 +142,7 @@ textarea {
 .start-record-btn {
 	right: 45px;
 }
+
+input.dialect {
+	outline: none;
+}

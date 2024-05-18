@@ -56,6 +56,9 @@ var detectLanguage = function () {
 											.text(translation.label)
 											.attr({ 'data-dialect': translation.code })
 											.addClass('active added-btn');
+										
+										translateText($('.left-text').attr('placeholder'), 'en', translation.code, 'placeholder-left');
+										translateText($('.right-text').attr('placeholder'), 'en', translation.code, 'placeholder-right');
 										if (mobileCheck()) {
 											$(".dialect:first").val(translation.label).attr('data-dialect', translation.code);
 										}
@@ -79,7 +82,7 @@ var detectLanguage = function () {
 	}
 }
 
-var translateText = function (text, sourceLang, targetLang, isLeft) {
+var translateText = function (text, sourceLang, targetLang, action) {
 	$.ajax({
 		url: 'https://translate.googleapis.com/translate_a/single',
 		type: 'GET',
@@ -93,7 +96,7 @@ var translateText = function (text, sourceLang, targetLang, isLeft) {
 		},
 		timeout: 30000,
 		beforeSend: function () {
-			if (isLeft == undefined && text.trim().length) {
+			if (action == undefined && text.trim().length) {
 				$('.right-text').val('Translating...');
 			}
 		},
@@ -105,11 +108,15 @@ var translateText = function (text, sourceLang, targetLang, isLeft) {
 					// console.log(element);
 					sTranslated += element[0];
 				});
-				// console.log(sTranslated, isLeft);
-				if (isLeft == undefined) {
+				// console.log(sTranslated, action);
+				if (action == undefined) {
 					$('.right-text').val(sTranslated);
-				} else {
+				} else if (action == true) {
 					$('.left-text').val(sTranslated);
+				} else if (action == 'placeholder-left') {
+					$('.left-text').attr('placeholder', sTranslated);
+				} else if (action == 'placeholder-right') {
+					$('.right-text').attr('placeholder', sTranslated);
 				}
 			} else {
 				console.error('Failed to translate text.', response);
