@@ -169,6 +169,7 @@ $(document).ready(function () {
 
 			setTimeout(() => {
 				translateText(oParams.q, oParams.sl, oParams.tl);
+				// speakNow({ target: $('#action-panel-right').find('.start-speak-btn').get(0) });
 			}, 33);
 		}
 	});
@@ -177,7 +178,7 @@ $(document).ready(function () {
 
 	$('.start-speak-btn').on('click', function (e) {
 		if ($(this).prop('tagName') != 'A') {
-			e = $(this).parent('a').get(0);
+			var e = { target: $(this).parent('a').get(0) };
 		}
 		speakNow(e);
 	});
