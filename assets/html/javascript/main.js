@@ -171,7 +171,7 @@ var runRecentLanguagesActive = function (direction, item) {
 		}
 		
 		buttonFirstClone
-			.text(item.label)
+			.html('<i class="fa fa-remove token-clear"></i>' + item.label)
 			.attr({ 'data-dialect': item.code })
 			.addClass('active added-btn');
 	
