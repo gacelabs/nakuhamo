@@ -24,9 +24,9 @@ html, body, h1, h2, h3, h4, h5, h6 {
 	height: 100px;
 }
 
-@media only screen and (max-width: 425px) and (orientation : portrait) {
+@media only screen and (width: 425px) {
 	.dialect {
-		width: 185.08px !important;
+		width: 175px !important;
 	}
 	textarea {
 		overflow-y: scroll;
@@ -42,9 +42,9 @@ html, body, h1, h2, h3, h4, h5, h6 {
 	}
 }
 
-@media only screen and (max-width: 375px) and (orientation : portrait) {
+@media only screen and (width: 375px) {
 	.dialect {
-		width: 160.1px !important;
+		width: 150px !important;
 	}
 	textarea {
 		overflow-y: scroll;
@@ -53,25 +53,16 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 @media only screen and (min-width: 321px) and (max-width: 374px) and (orientation : portrait) {
 	.dialect {
-		width: 133px !important;
+		width: 150px !important;
 	}
 	textarea {
 		overflow-y: scroll;
 	}
 }
 
-@media only screen and (max-width: 320px) and (orientation : portrait) {
+@media only screen and (width: 320px) {
 	.dialect {
-		width: 132.6px !important;
-	}
-	textarea {
-		overflow-y: scroll;
-	}
-}
-
-@media only screen and (max-width: 530px) and (orientation : landscape) {
-	.dialect {
-		width: 237.58px !important;
+		width: 120px !important;
 	}
 	textarea {
 		overflow-y: scroll;
@@ -80,7 +71,7 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 @media only screen and (max-width: 319px) and (orientation : portrait) {
 	.dialect {
-		width: 115px !important;
+		width: 120px !important;
 	}
 	textarea {
 		overflow-y: scroll;
