@@ -80,7 +80,7 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 @media only screen and (max-width: 319px) and (orientation : portrait) {
 	.dialect {
-		width: 119.8px !important;
+		width: 115px !important;
 	}
 	textarea {
 		overflow-y: scroll;
