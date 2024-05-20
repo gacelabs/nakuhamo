@@ -182,12 +182,6 @@ $(document).ready(function () {
 		speakNow(e);
 	});
 
-	$('.start-share-btn').on('blur', function (e) {
-		if ($(this).hasClass('show')) {
-			$(this).trigger('click');
-		}
-	});
-
 	/* $('.left-text').on('click', function (e) {
 		var sText = detectClipboard();
 		if (sText.length) {
