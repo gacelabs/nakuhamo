@@ -53,7 +53,7 @@ var detectLanguage = function () {
 									if ($.inArray(translation.code, arCodes) >= 0) {
 										$('#recent-languages-left').find('button:not(.first-buts)').removeClass('active');
 										buttonFirstClone
-											.text(translation.label)
+											.html(translation.label)
 											.attr({ 'data-dialect': translation.code })
 											.addClass('active added-btn');
 										
@@ -98,6 +98,7 @@ var translateText = function (text, sourceLang, targetLang, action) {
 		beforeSend: function () {
 			if (action == undefined && text.trim().length) {
 				$('.right-text').val('Translating...');
+				$('.share-box').addClass('hide');
 			}
 		},
 		success: function (response) {
@@ -111,6 +112,7 @@ var translateText = function (text, sourceLang, targetLang, action) {
 				// console.log(sTranslated, action);
 				if (action == undefined) {
 					$('.right-text').val(sTranslated);
+					$('.share-box').removeClass('hide');
 				} else if (action == true) {
 					$('.left-text').val(sTranslated);
 				} else if (action == 'placeholder-left') {
@@ -120,8 +122,10 @@ var translateText = function (text, sourceLang, targetLang, action) {
 				}
 			} else {
 				console.error('Failed to translate text.', response);
-				var isMobile = mobileCheck();
-				showToast({ content: 'Please enter text or ' + (isMobile ? 'tap' : 'click') + ' microphone to talk.', type: 'bad' });
+				if ($('.toast').is(':visible') == false) {
+					var isMobile = mobileCheck();
+					showToast({ content: 'Please enter text or ' + (isMobile ? 'tap' : 'click') + ' microphone to talk.', type: 'bad' });
+				}
 			}
 		},
 		error: function (xhr, status, error) {

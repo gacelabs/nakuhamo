@@ -53,7 +53,7 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 @media only screen and (min-width: 321px) and (max-width: 374px) and (orientation : portrait) {
 	.dialect {
-		width: 160.1px !important;
+		width: 136.58px !important;
 	}
 	textarea {
 		overflow-y: scroll;
@@ -90,7 +90,7 @@ html, body, h1, h2, h3, h4, h5, h6 {
 a:hover.start-speak-btn, a:hover.start-record-btn, a:hover.start-share-btn {
 	color: #6c757d !important;
 }
-.start-speak-btn, .start-record-btn, .start-share-btn {
+.start-speak-btn, .start-record-btn {
 	z-index: 1;
 	position: absolute;
 	padding: 0px 10px;
@@ -162,4 +162,13 @@ input.dialect {
 	top: 0;
 	right: 2px;
 	font-size: 9px;
+}
+
+.added-btn {
+	text-wrap: nowrap;
+}
+
+.share-box {
+	right: 45px;
+	bottom: -15px;
 }

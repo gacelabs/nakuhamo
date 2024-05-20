@@ -4,7 +4,7 @@ $(document).ready(function () {
 		dataType: "json",
 		success: function (data) {
 			// console.log(data);
-			$(".dialect").autocomplete({
+			$('.dialect').autocomplete({
 				source: data,
 				minLength: 0,
 				// autoFocus: true,
@@ -64,7 +64,7 @@ $(document).ready(function () {
 					}
 				}
 			}).focus(function () {
-				$(this).keydown();
+				$(this).autocomplete("search");
 			});
 		}
 	});
@@ -138,6 +138,9 @@ $(document).ready(function () {
 		}
 		speakNow(e);
 	});
+	$('.start-share-btn').on('click', function (e) {
+		
+	});
 
 	/* $('.left-text').on('click', function (e) {
 		var sText = detectClipboard();
@@ -178,5 +181,27 @@ var runRecentLanguagesActive = function (direction, item) {
 		if (mobileCheck()) {
 			$('.dialect:' + (direction == 'left' ? 'first' : 'last') + ':visible').val(item.label).attr('data-dialect', item.code);
 		}
+		
+		$('.token-clear').off('click').on('click', function (e) {
+			e.stopPropagation();
+			var parentGroup = $(this).parents('[id*=recent-languages-]');
+			var parentBtn = $(this).parent('.added-btn');
+			if (parentBtn.prev('.added-btn').length) {
+				parentBtn.prev('.added-btn').trigger('click');
+			} else if (parentBtn.next('.added-btn').length) {
+				parentBtn.next('.added-btn').trigger('click');
+			} else {
+				setTimeout(() => {
+					parentGroup.find('.dialect').val('').trigger('focus');
+				}, 77);
+				if (parentGroup.attr('id') == 'recent-languages-right') {
+					$('.share-box').addClass('hide');
+					$('.right-text').val('');
+				} else if (parentGroup.attr('id') == 'recent-languages-left') {
+					$('.left-text').val('');
+				}
+			}
+			parentBtn.remove();
+		});
 	}
 }
