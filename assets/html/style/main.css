@@ -127,6 +127,10 @@ textarea {
 	resize: none;
 }
 
+.right-text {
+	cursor: pointer;
+}
+
 #action-panel-left, #action-panel-right {
 	top: -7px;
 	position: relative;
@@ -162,4 +166,14 @@ input.dialect {
 .share-box {
 	right: 45px;
 	bottom: -15px;
+}
+
+.fa.fa-facebook {
+	color: blue;
+}
+.fa.fa-pinterest {
+	color: red;
+}
+.fa.fa-linkedin {
+	color: royalblue;
 }

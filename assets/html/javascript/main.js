@@ -31,19 +31,15 @@ $(document).ready(function () {
 					}
 
 					$('.added-btn').off('click').on('click', function (e) {
-						var currentActive = $(this).parents('[id*=recent-languages-]').find('button.active:not(.first-buts)');
-
+						var currentActive = $(this).parents('[id*=recent-languages-]');
 						setTimeout(() => {
-							$(this).parents('[id*=recent-languages-]').find('button:not(.first-buts)').removeClass('active');
+							var sDirection = currentActive.attr('id').replace('recent-languages-', '');
+							$('#recent-languages-' + sDirection).find('button:not(.first-buts)').removeClass('active');
 							$(this).addClass('active');
-							var sDirection = $(this).parents('[id*=recent-languages-]').attr('id');
-							if (sDirection == 'recent-languages-right') {
-								// console.log(sDirection);
-								// $('.dialect[data-index="right"]').val('');
+							if (sDirection == 'right') {
 								testTranslator();
 							} else {
-								// $('.dialect[data-index="left"]').val('');
-								var sl = currentActive.attr('data-dialect');
+								var sl = currentActive.find('button.active:not(.first-buts)').attr('data-dialect');
 								sl = (sl == undefined) ? $(".dialect[data-index=left]").attr('data-dialect') : sl;
 								var tl = $(this).attr('data-dialect');
 								translateText($('.left-text').val(), sl, tl, true);
@@ -53,11 +49,7 @@ $(document).ready(function () {
 				},
 				close: function (event, ui) {
 					if (mobileCheck() == false) {
-						if ($(this).attr('data-index') == 'left') {
-							var buttonAll = $('#recent-languages-left').find('button:not(.first-buts)');
-						} else {
-							var buttonAll = $('#recent-languages-right').find('button:not(.first-buts)');
-						}
+						var buttonAll = $('#recent-languages-' + $(this).attr('data-index')).find('button:not(.first-buts)');
 						if (buttonAll.length < 4) {
 							$(this).val('');
 						}
@@ -88,6 +80,7 @@ $(document).ready(function () {
 		}
 		if ($(this).val().trim().length == 0) {
 			$(this).prev('.clear-text-btn').trigger('click');
+			$('.share-box').addClass('hide');
 			$(this).prev('.clear-text-btn').hide();
 			$('textarea').css('height', actualClientHeight + 'px');
 		}
@@ -105,6 +98,7 @@ $(document).ready(function () {
 		}
 		if ($(this).val().trim().length == 0) {
 			$(this).prev('.clear-text-btn').trigger('click');
+			$('.share-box').addClass('hide');
 			$(this).prev('.clear-text-btn').hide();
 			$('textarea').css('height', actualClientHeight + 'px');
 		}
@@ -120,26 +114,78 @@ $(document).ready(function () {
 		} else {
 			$('textarea').val('');
 			$(this).prev('.clear-text-btn').hide();
+			$('.share-box').addClass('hide');
 			$('textarea').css('height', actualClientHeight + 'px');
 		}
 	});
 	
 	$('.clear-text-btn').on('click', function (e) {
+		$('.share-box').addClass('hide');
 		$('textarea').val('');
 		$('textarea').css('height', actualClientHeight + 'px');
 		$(this).hide();
+		if (window.location.search.length) {
+			window.history.replaceState(null, null, '/');
+		}
 	});
 
-	detectLanguage();
+	detectLanguage(function (translations) {
+		var urlSearch = window.location.search;
+		if (urlSearch.trim().length) {
+			var oParams = getAllURLParams();
+			// console.log(oParams);
+			$('.left-text').val(oParams.q);
+			$('.clear-text-btn').show();
+
+			var oLanguages = new JSONQuery(translations);
+			var query = {
+				select: { fields: '*' },
+				where: {
+					condition: [
+						{ field: 'code', operator: '=', value: oParams.sl },
+					]
+				}
+			};
+			var result = oLanguages.execute(query);
+			// console.log(result);
+			if (result.data.length) {
+				runRecentLanguagesActive('left', result.data[0]);
+			}
+
+			var oLanguages = new JSONQuery(translations);
+			var query = {
+				select: { fields: '*' },
+				where: {
+					condition: [
+						{ field: 'code', operator: '=', value: oParams.tl },
+					]
+				}
+			};
+			var result = oLanguages.execute(query);
+			// console.log(result);
+			if (result.data.length) {
+				runRecentLanguagesActive('right', result.data[0]);
+			}
+
+			setTimeout(() => {
+				translateText(oParams.q, oParams.sl, oParams.tl);
+			}, 33);
+		}
+	});
+
 	runRecordText();
+
 	$('.start-speak-btn').on('click', function (e) {
 		if ($(this).prop('tagName') != 'A') {
 			e = $(this).parent('a').get(0);
 		}
 		speakNow(e);
 	});
-	$('.start-share-btn').on('click', function (e) {
-		
+
+	$('.start-share-btn').on('blur', function (e) {
+		if ($(this).hasClass('show')) {
+			$(this).trigger('click');
+		}
 	});
 
 	/* $('.left-text').on('click', function (e) {
@@ -162,46 +208,62 @@ $(document).ready(function () {
 });
 
 var runRecentLanguagesActive = function (direction, item) {
-	$('#recent-languages-'+direction).find('button:not(.first-buts)').removeClass('active');
 	var buttonAll = $('#recent-languages-' + direction).find('button:not(.first-buts)');
-
-	if (buttonAll.length < 4) {
-		var buttonFirst = $('#recent-languages-'+direction).find('button.first-buts');
-		if (buttonAll.length == 0) {
-			var buttonFirstClone = buttonFirst.clone(true).removeClass('hide first-buts').insertAfter(buttonFirst);
-		} else {
-			var buttonFirstClone = buttonFirst.clone(true).removeClass('hide first-buts').insertAfter(buttonAll.last());
-		}
-		
-		buttonFirstClone
-			.html('<i class="fa fa-remove token-clear"></i>' + item.label)
-			.attr({ 'data-dialect': item.code })
-			.addClass('active added-btn');
+	var bCreated = false;
 	
-		if (mobileCheck()) {
-			$('.dialect:' + (direction == 'left' ? 'first' : 'last') + ':visible').val(item.label).attr('data-dialect', item.code);
-		}
-		
-		$('.token-clear').off('click').on('click', function (e) {
-			e.stopPropagation();
-			var parentGroup = $(this).parents('[id*=recent-languages-]');
-			var parentBtn = $(this).parent('.added-btn');
-			if (parentBtn.prev('.added-btn').length) {
-				parentBtn.prev('.added-btn').trigger('click');
-			} else if (parentBtn.next('.added-btn').length) {
-				parentBtn.next('.added-btn').trigger('click');
+	if (buttonAll.length < 4) {
+		if (buttonAll.is('[data-dialect="' + item.code + '"]') == false) {
+			$('#recent-languages-'+direction).find('button:not(.first-buts)').removeClass('active');
+			var buttonFirst = $('#recent-languages-'+direction).find('button.first-buts');
+			if (buttonAll.length == 0) {
+				var buttonFirstClone = buttonFirst.clone(true).removeClass('hide first-buts').insertAfter(buttonFirst);
 			} else {
-				setTimeout(() => {
-					parentGroup.find('.dialect').val('').trigger('focus');
-				}, 77);
-				if (parentGroup.attr('id') == 'recent-languages-right') {
-					$('.share-box').addClass('hide');
-					$('.right-text').val('');
-				} else if (parentGroup.attr('id') == 'recent-languages-left') {
-					$('.left-text').val('');
-				}
+				var buttonFirstClone = buttonFirst.clone(true).removeClass('hide first-buts').insertAfter(buttonAll.last());
 			}
-			parentBtn.remove();
+			
+			buttonFirstClone
+				.html('<i class="fa fa-remove token-clear"></i>' + item.label)
+				.attr({ 'data-dialect': item.code })
+				.addClass('active added-btn');
+
+			bCreated = true;
+		
+			if (mobileCheck()) {
+				$('.dialect[data-index="' + direction + '"]').val(item.label).attr('data-dialect', item.code);
+			}
+			
+			$('.token-clear').off('click').on('click', function (e) {
+				e.stopPropagation();
+				if (window.location.search.length) {
+					window.history.replaceState(null, null, '/');
+				}
+				var parentGroup = $(this).parents('[id*=recent-languages-]');
+				var parentBtn = $(this).parent('.added-btn');
+				if (parentBtn.prev('.added-btn').length) {
+					parentBtn.prev('.added-btn').trigger('click');
+				} else if (parentBtn.next('.added-btn').length) {
+					parentBtn.next('.added-btn').trigger('click');
+				} else {
+					setTimeout(() => {
+						parentGroup.find('.dialect').val('').trigger('focus');
+					}, 77);
+					if (parentGroup.attr('id') == 'recent-languages-right') {
+						$('.share-box').addClass('hide');
+						$('.right-text').val('');
+					} else if (parentGroup.attr('id') == 'recent-languages-left') {
+						$('.left-text').val('');
+					}
+				}
+				parentBtn.remove();
+			});
+		}
+	}
+
+	if (bCreated == false) {
+		$.each(buttonAll, function (i, elem) {
+			if ($(elem).hasClass('active') == false && $(elem).attr('data-dialect') == item.code) {
+				$(elem).trigger('click');
+			}
 		});
 	}
 }

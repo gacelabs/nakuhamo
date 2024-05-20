@@ -17,7 +17,7 @@ var detectClipboard = async function () {
 	}
 }
 
-var detectLanguage = function () {
+var detectLanguage = function (fnCallBack) {
 	try {
 		$.get("https://ipinfo.io", function (ipinfo) {
 			// console.log(ipinfo);
@@ -66,6 +66,9 @@ var detectLanguage = function () {
 								}
 								$('.left-text').removeAttr('disabled');
 								$('#action-panel-left').css({ 'background-color': '#fff;' });
+							},
+							complete: function (data) {
+								if (typeof fnCallBack == 'function') fnCallBack(data.responseJSON);
 							}
 						});
 					}, 1000);
@@ -83,6 +86,7 @@ var detectLanguage = function () {
 }
 
 var translateText = function (text, sourceLang, targetLang, action) {
+	$('.share-box').addClass('hide');
 	$.ajax({
 		url: 'https://translate.googleapis.com/translate_a/single',
 		type: 'GET',
@@ -103,29 +107,34 @@ var translateText = function (text, sourceLang, targetLang, action) {
 		},
 		success: function (response) {
 			// console.log(response);
-			if (response && response[0] && response[0]) {
+			if (response && response[0]) {
 				var sTranslated = '';
 				response[0].forEach(element => {
 					// console.log(element);
 					sTranslated += element[0];
 				});
 				// console.log(sTranslated, action);
-				if (action == undefined) {
-					$('.right-text').val(sTranslated);
-					$('.share-box').removeClass('hide');
-				} else if (action == true) {
-					$('.left-text').val(sTranslated);
-				} else if (action == 'placeholder-left') {
-					$('.left-text').attr('placeholder', sTranslated);
-				} else if (action == 'placeholder-right') {
-					$('.right-text').attr('placeholder', sTranslated);
+				if (sTranslated.trim().length) {
+					if (action == undefined) {
+						$('.right-text').val(sTranslated);
+						$('.share-box').removeClass('hide');
+						var sDataLink = window.location.href + `?sl=${sourceLang}&tl=${targetLang}&q=${text}`;
+						$('.share-box').find('.dropdown-menu .dropdown-item').each(function (i, elem) {
+							var sHref = $(elem).attr('data-href');
+							elem.href = sHref+sDataLink;
+						});
+					} else if (action == true) {
+						$('.left-text').val(sTranslated);
+					} else if (action == 'placeholder-left') {
+						$('.left-text').attr('placeholder', sTranslated);
+					} else if (action == 'placeholder-right') {
+						$('.right-text').attr('placeholder', sTranslated);
+					}
 				}
 			} else {
-				console.error('Failed to translate text.', response);
-				if ($('.toast').is(':visible') == false) {
-					var isMobile = mobileCheck();
-					showToast({ content: 'Please enter text or ' + (isMobile ? 'tap' : 'click') + ' microphone to talk.', type: 'bad' });
-				}
+				var isMobile = mobileCheck();
+				showToast({ content: 'Please enter text or ' + (isMobile ? 'tap' : 'click') + ' microphone to talk.', type: 'bad' }, $('.start-record-btn'));
+				console.error('Failed to translate text.');
 			}
 		},
 		error: function (xhr, status, error) {
@@ -170,42 +179,54 @@ function urlParams() {
 }
 
 var isMessageSpeaking = false;
-function showToast(params) {
+function showToast(params, selector) {
 	let toastClone = $('#tc-toast').clone().removeAttr('id');
-	toastClone.find('.toast-body').html(params.content);
-	toastClone.removeClass('bg-success bg-danger bg-warning bg-info');
-	switch (params.type) {
-		case 'good':
-			toastClone.addClass('bg-success');
-			break;
-		case 'bad':
-			toastClone.addClass('bg-danger');
-			break;
-		case 'alert':
-			toastClone.addClass('bg-warning');
-			break;
-		case 'info':
-			toastClone.addClass('bg-info');
-			break;
-	}
-	$('.toast-container').prepend(toastClone);
-	toastClone.toast({ delay: 13000 });
-	toastClone.toast('show');
+	var arrStore = [];
+	$('.toast-body:visible').map(function (i, elem) {
+		arrStore.push($(this).text());
+	})
+	if ($.inArray(params.content, arrStore) < 0) {
+		toastClone.find('.toast-body').html(params.content);
+		toastClone.removeClass('bg-success bg-danger bg-warning bg-info');
+		switch (params.type) {
+			case 'good':
+				toastClone.addClass('bg-success');
+				break;
+			case 'bad':
+				toastClone.addClass('bg-danger');
+				break;
+			case 'alert':
+				toastClone.addClass('bg-warning');
+				break;
+			case 'info':
+				toastClone.addClass('bg-info');
+				break;
+		}
+		$('.toast-container').prepend(toastClone);
+		toastClone.toast({ delay: 13000 });
+		toastClone.toast('show');
+	
+		if (typeof params.closure == 'function') {
+			params.closure();
+		}
 
-	if (typeof params.closure == 'function') {
-		params.closure();
+		if (selector != undefined && selector.length) {
+			for (i = 0; i < 3; i++) {
+				selector.fadeTo('slow', 0.5).fadeTo('slow', 1.0);
+			}
+		}
+	
+		window.speechSynthesis.cancel();
+		if (isMessageSpeaking) {
+			isMessageSpeaking = false;
+			return;
+		}
+		isMessageSpeaking = true;
+		var utterance = new SpeechSynthesisUtterance(params.content);
+		utterance.lang = 'en'; // Set the language
+		utterance.onend = function () { isMessageSpeaking = false; };
+		window.speechSynthesis.speak(utterance);
 	}
-
-	window.speechSynthesis.cancel();
-	if (isMessageSpeaking) {
-		isMessageSpeaking = false;
-		return;
-	}
-	isMessageSpeaking = true;
-	var utterance = new SpeechSynthesisUtterance(params.content);
-	utterance.lang = 'en'; // Set the language
-	utterance.onend = function () { isMessageSpeaking = false; };
-	window.speechSynthesis.speak(utterance);
 }
 
 function showNotification(title, body, redirectUrl) {
@@ -569,13 +590,17 @@ var speakNow = function (e) {
 				showToast({ content: 'Please select a language ' + (isRight ? 'target' : 'source'), type: 'bad' });
 			} else {
 				var isMobile = mobileCheck();
-				showToast({ content: 'Please enter text or ' + (isMobile ? 'tap' : 'click') + ' microphone to talk.', type: 'bad' });
+				showToast({ content: 'Please enter text or ' + (isMobile ? 'tap' : 'click') + ' microphone to talk.', type: 'bad' }, $('.start-record-btn'));
 			}
 		} else {
 			// Cancel any ongoing speech synthesis
 			window.speechSynthesis.cancel();
 			try {
-				$(e.target).removeAttr('class').attr('class', 'fa fa-stop').css('color', 'red');
+				var aBtn = $(e.target);
+				if (aBtn.prop('tagName') == 'A') {
+					aBtn = aBtn.find('i');
+				}
+				aBtn.removeAttr('class').attr('class', 'fa fa-stop').css('color', 'red');
 				speechQueue = splitTextIntoChunks(text, MAX_CHUNK_LENGTH);
 				speakNextChunk(sLanguage, e);
 			} catch (error) {
@@ -584,7 +609,11 @@ var speakNow = function (e) {
 		}
 	} else {
 		window.speechSynthesis.speaking = false;
-		$(e.target).removeAttr('class').attr('class', 'fa fa-volume-up').css('color', '');
+		var aBtn = $(e.target);
+		if (aBtn.prop('tagName') == 'A') {
+			aBtn = aBtn.find('i');
+		}
+		aBtn.removeAttr('class').attr('class', 'fa fa-volume-up').css('color', '');
 		window.speechSynthesis.cancel();
 		showToast({ content: 'Speaker stopped.', type: 'info' });
 	}
@@ -643,7 +672,11 @@ function speakNextChunk(sLanguage, e) {
 		};
 		window.speechSynthesis.speak(utterance);
 	} else {
-		$(e.target).removeAttr('class').attr('class', 'fa fa-volume-up').css('color', '');
+		var aBtn = $(e.target);
+		if (aBtn.prop('tagName') == 'A') {
+			aBtn = aBtn.find('i');
+		}
+		aBtn.removeAttr('class').attr('class', 'fa fa-volume-up').css('color', '');
 	}
 }
 
@@ -653,7 +686,7 @@ var speakNowV2 = function (recorder, chunks) {
 		var text = $('.right-text').val();
 		if (text.trim() === '') {
 			var isMobile = mobileCheck();
-			showToast({ content: 'Please enter text or ' + (isMobile ? 'tap' : 'click') + ' microphone to talk.', type: 'bad' });
+			showToast({ content: 'Please enter text or ' + (isMobile ? 'tap' : 'click') + ' microphone to talk.', type: 'bad' }, $('.start-record-btn'));
 			return;
 		}
 		// Cancel any ongoing speech synthesis
@@ -701,3 +734,12 @@ function speakNext(recorder) {
 	window.speechSynthesis.speak(utterance);
 }
 
+var getAllURLParams = function (search) {
+	if (search == undefined) search = window.location.search;
+	const params = new URLSearchParams(search);
+	let paramObj = {};
+	for (var value of params.keys()) {
+		paramObj[value] = params.get(value);
+	}
+	return paramObj;
+}
