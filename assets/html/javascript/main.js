@@ -124,9 +124,7 @@ $(document).ready(function () {
 		$('textarea').val('');
 		$('textarea').css('height', actualClientHeight + 'px');
 		$(this).hide();
-		if (window.location.search.length) {
-			window.history.replaceState(null, null, '/');
-		}
+		resetUrlOrigin();
 	});
 
 	detectLanguage(function (translations) {
@@ -229,9 +227,7 @@ var runRecentLanguagesActive = function (direction, item) {
 			
 			$('.token-clear').off('click').on('click', function (e) {
 				e.stopPropagation();
-				if (window.location.search.length) {
-					window.history.replaceState(null, null, '/');
-				}
+				resetUrlOrigin();
 				var parentGroup = $(this).parents('[id*=recent-languages-]');
 				var parentBtn = $(this).parent('.added-btn');
 				if (parentBtn.prev('.added-btn').length) {

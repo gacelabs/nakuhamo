@@ -743,3 +743,13 @@ var getAllURLParams = function (search) {
 	}
 	return paramObj;
 }
+
+var resetUrlOrigin = function () {
+	if (window.location.search.length) {
+		var sPath = '/';
+		if (window.location.host == 'gacelabs.github.io' || window.location.hostname == 'gacelabs.github.io') {
+			sPath = window.location.pathname;
+		}
+		window.history.replaceState(null, null, sPath);
+	}
+}
