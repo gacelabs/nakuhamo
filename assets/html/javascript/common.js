@@ -747,7 +747,7 @@ var getAllURLParams = function (search) {
 var resetUrlOrigin = function () {
 	if (window.location.search.length) {
 		var sPath = '/';
-		if (window.location.host == 'gacelabs.github.io' || window.location.hostname == 'gacelabs.github.io') {
+		if ([window.location.host, window.location.hostname].includes('gacelabs.github.io')) {
 			sPath = window.location.pathname;
 		}
 		window.history.replaceState(null, null, sPath);
