@@ -121,6 +121,10 @@ var translateText = function (text, sourceLang, targetLang, action) {
 						var sDataLink = window.location.href + `?sl=${sourceLang}&tl=${targetLang}&q=${text}`;
 						$('.share-box').find('.dropdown-menu .dropdown-item').each(function (i, elem) {
 							var sHref = $(elem).attr('data-href');
+							if ($(elem).hasClass('fb-messenger')) {
+								sHref = sHref.replace('&link=', '&link=' + sDataLink);
+								sHref.replace('&redirect_uri=', '&redirect_uri=' + sDataLink);
+							}
 							elem.href = sHref+sDataLink;
 						});
 					} else if (action == true) {

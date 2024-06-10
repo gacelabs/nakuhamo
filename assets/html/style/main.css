@@ -168,12 +168,15 @@ input.dialect {
 	bottom: -15px;
 }
 
-.fa.fa-facebook {
+.fab.fa-facebook {
 	color: blue;
 }
-.fa.fa-pinterest {
+.fab.fa-facebook-messenger {
+	color: #eb519e;
+}
+.fab.fa-pinterest {
 	color: red;
 }
-.fa.fa-linkedin {
+.fab.fa-linkedin {
 	color: royalblue;
 }
