@@ -124,7 +124,7 @@ var translateText = function (text, sourceLang, targetLang, action) {
 							if ($(elem).hasClass('fb-messenger')) {
 								sHref = sHref.replace('&link=', '&link=' + encodeURIComponent(sDataLink));
 								sHref = sHref.replace('&redirect_uri=', '&redirect_uri=' + encodeURIComponent(sDataLink));
-								console.log(sHref);
+								// console.log(sHref);
 							}
 							elem.href = sHref+sDataLink;
 						});
@@ -362,7 +362,7 @@ var testTranslator = function () {
 	var tl = $('#recent-languages-right').find('button.active').attr('data-dialect');
 	tl = (tl == undefined) ? $(".dialect[data-index=right]").attr('data-dialect') : tl;
 
-	// console.log(sl, tl);
+	console.log(sl, tl);
 	if (sl != undefined && tl != undefined) {
 		translateText($('.left-text').val(), sl, tl);
 	} else {

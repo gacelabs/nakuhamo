@@ -32,19 +32,25 @@ $(document).ready(function () {
 
 					$('.added-btn').off('click').on('click', function (e) {
 						var currentActive = $(this).parents('[id*=recent-languages-]');
-						setTimeout(() => {
-							var sDirection = currentActive.attr('id').replace('recent-languages-', '');
+						var sDirection = currentActive.attr('id').replace('recent-languages-', '');
+						var recentLang = $('#recent-languages-' + sDirection).find('button:not(.first-buts).active').attr('data-dialect');
+
+						if (sDirection != 'right') {
+							var sl = currentActive.find('button:not(.first-buts).active').attr('data-dialect');
+							sl = (sl == undefined) ? $(".dialect[data-index=left]").attr('data-dialect') : sl;
+							var tl = $(this).attr('data-dialect');
+							if (sl == tl) sl = recentLang;
+							// console.log(sl, tl, sl == tl, recentLang);
+							translateText($('.left-text').val(), sl, tl, true);
+							setTimeout(() => {
+								$('#recent-languages-' + sDirection).find('button:not(.first-buts)').removeClass('active');
+								$(this).addClass('active');
+							}, 33);
+						} else {
 							$('#recent-languages-' + sDirection).find('button:not(.first-buts)').removeClass('active');
 							$(this).addClass('active');
-							if (sDirection == 'right') {
-								testTranslator();
-							} else {
-								var sl = currentActive.find('button.active:not(.first-buts)').attr('data-dialect');
-								sl = (sl == undefined) ? $(".dialect[data-index=left]").attr('data-dialect') : sl;
-								var tl = $(this).attr('data-dialect');
-								translateText($('.left-text').val(), sl, tl, true);
-							}
-						}, 33);
+							setTimeout(testTranslator, 33);
+						}
 					});
 				},
 				close: function (event, ui) {
