@@ -10,7 +10,7 @@
   { "label": "Bengali", "value": "Bengali", "code": "bn" },
   { "label": "Bosnian", "value": "Bosnian", "code": "bs" },
   { "label": "Bulgarian", "value": "Bulgarian", "code": "bg" },
-  { "label": "Canadian", "value": "Canadian", "code": "iu" },
+  { "label": "Canadian", "value": "Canadian", "code": "en-CA" },
   { "label": "Catalan", "value": "Catalan", "code": "ca" },
   { "label": "Cebuano", "value": "Cebuano", "code": "ceb" },
   { "label": "Chinese (Simplified)", "value": "Chinese (Simplified)", "code": "zh-CN" },
