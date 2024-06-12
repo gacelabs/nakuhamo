@@ -35,7 +35,7 @@ var detectLanguage = function (fnCallBack) {
 				var result = oLanguages.execute(query);
 
 				if (result.data.length) {
-					var oData = result.data[0];
+					var oData = result.data[0], bFound = false;
 					// console.log(oData, oData.language_codes.split(','));
 					var arCodes = oData.language_codes.split(',');
 					var buttonFirst = $('#recent-languages-left').find('button.first-buts');
@@ -50,8 +50,9 @@ var detectLanguage = function (fnCallBack) {
 							success: function (translations) {
 								for (var x in translations) {
 									var translation = translations[x];
+									$('#recent-languages-left').find('button:not(.first-buts)').removeClass('active');
 									if ($.inArray(translation.code, arCodes) >= 0) {
-										$('#recent-languages-left').find('button:not(.first-buts)').removeClass('active');
+										bFound = true;
 										buttonFirstClone
 											.html(translation.label)
 											.attr({ 'data-dialect': translation.code })
@@ -69,6 +70,13 @@ var detectLanguage = function (fnCallBack) {
 							},
 							complete: function (data) {
 								if (typeof fnCallBack == 'function') fnCallBack(data.responseJSON);
+								if (bFound == false) {
+									// default dialect
+									buttonFirstClone
+										.html('English')
+										.attr({ 'data-dialect': 'en' })
+										.addClass('active added-btn');
+								}
 							}
 						});
 					}, 1000);
